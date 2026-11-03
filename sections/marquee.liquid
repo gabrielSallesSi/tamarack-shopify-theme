@@ -1,0 +1,64 @@
+{%- comment -%}
+  Scrolling strip. Pattern adapted from the Kibo UI Marquee on 21st.dev (MIT, haydenbleasel/kibo),
+  which wraps react-fast-marquee: autofill, pause on hover and faded edges, rebuilt in CSS.
+{%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
+  <section class="marquee marquee--{{ section.settings.style }}" style="--marquee-duration: {{ section.settings.duration }}s;" aria-label="{{ section.settings.label | escape }}">
+    <ul class="visually-hidden" role="list">
+      {%- for block in section.blocks -%}
+        <li>{{ block.settings.text | escape }}</li>
+      {%- endfor -%}
+    </ul>
+    <div class="marquee__track" aria-hidden="true">
+      {%- for copy in (1..2) -%}
+        <div class="marquee__group">
+          {%- for repeat in (1..2) -%}
+            {%- for block in section.blocks -%}
+              <span class="marquee__item" {% if copy == 1 and repeat == 1 %}{{ block.shopify_attributes }}{% endif %}>
+                {% render 'logo-mark' %}
+                {{ block.settings.text | escape }}
+              </span>
+            {%- endfor -%}
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Marquee",
+  "class": "section-marquee",
+  "settings": [
+    { "type": "text", "id": "label", "label": "Accessible label", "default": "Why people carry Tamarack" },
+    { "type": "select", "id": "style", "label": "Style", "default": "blaze", "options": [
+      { "value": "blaze", "label": "Blaze" },
+      { "value": "ink", "label": "Ink" },
+      { "value": "glacier", "label": "Glacier" }
+    ] },
+    { "type": "range", "id": "duration", "label": "Loop duration", "min": 10, "max": 80, "step": 5, "unit": "s", "default": 40 }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Item",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Free shipping over $75" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee",
+      "blocks": [
+        { "type": "item", "settings": { "text": "Ice for 24 hours" } },
+        { "type": "item", "settings": { "text": "Coffee hot for 12" } },
+        { "type": "item", "settings": { "text": "Free shipping over $75" } },
+        { "type": "item", "settings": { "text": "30-day trail test" } },
+        { "type": "item", "settings": { "text": "Lifetime warranty on every bottle" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

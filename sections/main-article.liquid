@@ -1,0 +1,21 @@
+<article class="section">
+  <div class="page-width page-width--narrow">
+    <p class="card__meta">{{ article.published_at | time_tag: format: 'month_day_year' }}</p>
+    <h1 class="page-title">{{ article.title | escape }}</h1>
+    {%- if article.image -%}
+      <div class="article__media">
+        {{ article.image | image_url: width: 1400 | image_tag: loading: 'eager', sizes: '(min-width: 990px) 760px, 100vw', alt: article.title }}
+      </div>
+    {%- endif -%}
+    <div class="rte">{{ article.content }}</div>
+    <p class="section-foot"><a href="{{ blog.url }}" class="text-link">Back to {{ blog.title | escape }}</a></p>
+  </div>
+</article>
+
+{% schema %}
+{
+  "name": "Article",
+  "class": "section-main-article",
+  "settings": []
+}
+{% endschema %}

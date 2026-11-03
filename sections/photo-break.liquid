@@ -1,0 +1,161 @@
+{%- comment -%}
+  Full-bleed nature photo with a headline. The photo drifts slower than the page (parallax) and eases in from a slight zoom.
+{%- endcomment -%}
+<section class="photo-break photo-break--{{ section.settings.align }}{% if section.settings.grade == 'twilight' %} photo-break--twilight{% endif %}" data-photo-break style="--photo-h: {{ section.settings.height }}vh;" aria-labelledby="photo-break-{{ section.id }}">
+  <div class="photo-break__media" data-photo-break-media>
+    {% render 'nature-photo', image: section.settings.photo, url: section.settings.photo_url, alt: section.settings.photo_alt, class: 'photo-break__img', position: section.settings.photo_position %}
+  </div>
+  {%- if section.settings.grade == 'twilight' -%}
+    <span class="hero__grade" aria-hidden="true"></span>
+  {%- endif -%}
+  {%- if section.settings.fog -%}
+    <span class="hero__fog hero__fog--a" aria-hidden="true"></span>
+    <span class="hero__fog hero__fog--b" aria-hidden="true"></span>
+  {%- endif -%}
+  <span class="photo-break__shade" style="--shade: {{ section.settings.shade | divided_by: 100.0 }};" aria-hidden="true"></span>
+  {%- liquid
+    assign log_product = section.settings.product
+    assign has_log = false
+    if section.blocks.size > 0 or log_product != blank
+      assign has_log = true
+    endif
+  -%}
+  <div class="page-width photo-break__content{% if has_log %} photo-break__content--split{% endif %}">
+    <div class="photo-break__copy">
+      <h2 id="photo-break-{{ section.id }}" class="photo-break__title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="photo-break__text">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.button_label != blank -%}
+        <a href="{{ section.settings.button_link | default: log_product.url | default: routes.all_products_collection_url }}" class="button button--light">{{ section.settings.button_label | escape }}</a>
+      {%- endif -%}
+    </div>
+
+    {%- if has_log -%}
+      {%- comment -%}
+        Temperature readout. The number rolls like an odometer between the entries
+        (adapted from React Bits Counter, MIT + Commons Clause, David Haz).
+      {%- endcomment -%}
+      {%- assign first_entry = section.blocks.first -%}
+      <aside class="readout readout--{{ first_entry.settings.tone | default: 'hot' }}" data-readout aria-label="{{ section.settings.log_title | escape }}">
+        <div class="readout__head">
+          <p class="readout__eyebrow">{{ section.settings.log_eyebrow | escape }}</p>
+          <p class="readout__title">{{ section.settings.log_title | escape }}</p>
+        </div>
+        {%- if section.blocks.size > 0 -%}
+          <div class="readout__display">
+            <span class="readout__odo" data-odo data-digits="{{ section.settings.digits }}">
+              <span class="readout__static">{{ first_entry.settings.value }}</span>
+            </span>
+            <span class="readout__unit" data-readout-unit>{{ first_entry.settings.unit | escape }}</span>
+            <span class="visually-hidden" aria-live="polite" data-readout-sr>{{ first_entry.settings.when | escape }}: {{ first_entry.settings.value }}{{ first_entry.settings.unit | escape }}</span>
+          </div>
+          <p class="readout__caption" data-readout-caption>{{ first_entry.settings.what | escape }}</p>
+          <div class="readout__tabs" role="group" aria-label="Moments">
+            {%- for block in section.blocks -%}
+              <button type="button" class="readout__tab{% if forloop.first %} is-active{% endif %}" aria-pressed="{% if forloop.first %}true{% else %}false{% endif %}"
+                data-readout-tab data-value="{{ block.settings.value }}" data-unit="{{ block.settings.unit | escape }}"
+                data-tone="{{ block.settings.tone }}" data-caption="{{ block.settings.what | escape }}" data-label="{{ block.settings.when | escape }}" {{ block.shopify_attributes }}>
+                <span class="readout__tab-label">{{ block.settings.when | escape }}</span>
+                <span class="readout__tab-bar" aria-hidden="true"><span></span></span>
+              </button>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if log_product != blank -%}
+          {%- liquid
+            assign log_variant = log_product.selected_or_first_available_variant
+            for v in log_product.variants
+              if v.options contains section.settings.product_color
+                assign log_variant = v
+                break
+              endif
+            endfor
+            assign color_count = 0
+            for option in log_product.options_with_values
+              assign option_name = option.name | downcase
+              if option_name == 'color' or option_name == 'colour'
+                assign color_count = option.values.size
+              endif
+            endfor
+          -%}
+          <a href="{{ log_variant.url }}" class="readout__product">
+            <span class="readout__thumb">{% render 'product-media', product: log_product, variant: log_variant, uid: 'readout', sizes: '64px' %}</span>
+            <span class="readout__product-copy">
+              <span class="readout__product-title">{{ log_product.title | escape }}</span>
+              <span class="readout__product-meta">{{ log_variant.price | money }}{% if color_count > 1 %} · {{ color_count }} colors{% endif %}</span>
+            </span>
+            <span class="readout__go">Shop</span>
+          </a>
+        {%- endif -%}
+      </aside>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Photo break",
+  "class": "section-photo-break",
+  "settings": [
+    { "type": "image_picker", "id": "photo", "label": "Photo", "info": "Leave empty to use the photo link below." },
+    { "type": "text", "id": "photo_url", "label": "Photo link", "default": "https://images.unsplash.com/photo-1675702662605-57e37a8cb2c3" },
+    { "type": "text", "id": "photo_alt", "label": "Photo description", "default": "Pine-covered mountainside wrapped in heavy fog" },
+    { "type": "select", "id": "photo_position", "label": "Photo focus", "default": "center center", "options": [
+      { "value": "center 20%", "label": "Top" },
+      { "value": "center 40%", "label": "Upper middle" },
+      { "value": "70% 40%", "label": "Upper middle, right side on phones" },
+      { "value": "center center", "label": "Center" },
+      { "value": "center 75%", "label": "Bottom" }
+    ] },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Made for days that end above the tree line." },
+    { "type": "text", "id": "text", "label": "Text", "default": "Fill it at the trailhead, forget about it until the ridge." },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the flask" },
+    { "type": "url", "id": "button_link", "label": "Button link" },
+    { "type": "select", "id": "align", "label": "Text position", "default": "left", "options": [
+      { "value": "left", "label": "Bottom left" },
+      { "value": "center", "label": "Center" }
+    ] },
+    { "type": "range", "id": "height", "label": "Height", "min": 50, "max": 100, "step": 5, "unit": "vh", "default": 85 },
+    { "type": "range", "id": "shade", "label": "Darken behind text", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 55 },
+    { "type": "select", "id": "grade", "label": "Color grade", "default": "twilight", "options": [
+      { "value": "none", "label": "Natural" },
+      { "value": "twilight", "label": "Cold forest (blue-green, moody)" }
+    ] },
+    { "type": "checkbox", "id": "fog", "label": "Drifting fog", "default": true },
+    { "type": "header", "content": "Trail log" },
+    { "type": "text", "id": "log_eyebrow", "label": "Small label", "default": "Inside the flask" },
+    { "type": "text", "id": "log_title", "label": "Title", "default": "One fill, one long day" },
+    { "type": "range", "id": "digits", "label": "Digit tiles", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "product", "id": "product", "label": "Product shortcut" },
+    { "type": "text", "id": "product_color", "label": "Product color shown", "default": "Spruce" }
+  ],
+  "blocks": [
+    {
+      "type": "entry",
+      "name": "Moment",
+      "limit": 4,
+      "settings": [
+        { "type": "text", "id": "when", "label": "Tab label", "default": "Poured" },
+        { "type": "text", "id": "what", "label": "Caption", "default": "Coffee goes in at the trailhead" },
+        { "type": "number", "id": "value", "label": "Number", "default": 92 },
+        { "type": "text", "id": "unit", "label": "Unit", "default": "°C" },
+        { "type": "select", "id": "tone", "label": "Color", "default": "hot", "options": [
+          { "value": "hot", "label": "Warm (orange)" },
+          { "value": "cold", "label": "Cold (blue)" },
+          { "value": "neutral", "label": "Neutral" }
+        ] }
+      ]
+    }
+  ],
+  "presets": [{
+    "name": "Photo break",
+    "blocks": [
+      { "type": "entry", "settings": { "when": "Poured", "what": "Coffee goes in at the trailhead", "value": 92, "unit": "°C", "tone": "hot" } },
+      { "type": "entry", "settings": { "when": "12 h later", "what": "Still hot enough to warm your hands", "value": 62, "unit": "°C", "tone": "hot" } },
+      { "type": "entry", "settings": { "when": "Iced, 24 h", "what": "Ice water stays under this all day", "value": 6, "unit": "°C", "tone": "cold" } }
+    ]
+  }]
+}
+{% endschema %}

@@ -1,0 +1,39 @@
+{%- paginate search.results by 12 -%}
+  <section class="section">
+    <div class="page-width">
+      <h1 class="page-title">Search</h1>
+      <form action="{{ routes.search_url }}" method="get" role="search" class="search-form">
+        <label for="SearchInput" class="visually-hidden">Search the store</label>
+        <div class="field-row">
+          <input id="SearchInput" type="search" name="q" value="{{ search.terms | escape }}" class="field" placeholder="Bottles, lids, colors">
+          <input type="hidden" name="type" value="product">
+          <button type="submit" class="button button--primary">Search</button>
+        </div>
+      </form>
+
+      {%- if search.performed -%}
+        <p class="collection__count">{{ search.results_count }} {{ search.results_count | pluralize: 'result', 'results' }} for "{{ search.terms | escape }}"</p>
+        <ul class="grid grid--products" role="list">
+          {%- for item in search.results -%}
+            {%- if item.object_type == 'product' -%}
+              <li>{% render 'product-card', product: item, index: forloop.index %}</li>
+            {%- else -%}
+              <li class="search-hit"><a href="{{ item.url }}" class="text-link">{{ item.title | escape }}</a></li>
+            {%- endif -%}
+          {%- else -%}
+            <li class="empty-note">Nothing matched. Try a color or a size, like "spruce" or "32 oz".</li>
+          {%- endfor -%}
+        </ul>
+        {% render 'pagination', paginate: paginate %}
+      {%- endif -%}
+    </div>
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Search",
+  "class": "section-main-search",
+  "settings": []
+}
+{% endschema %}

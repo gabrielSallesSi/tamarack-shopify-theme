@@ -1,0 +1,88 @@
+{%- comment -%}
+  Vector product art, tinted through the --art-color custom property so JS can recolor it.
+  Params:
+    shape: bottle | tumbler | jug | mug | lid | tin | sling (default bottle)
+    hex: starting color
+    uid: unique string for gradient ids
+    label: accessible name
+    class: extra classes
+{%- endcomment -%}
+{%- liquid
+  assign shape = shape | default: 'bottle'
+  assign hex = hex | default: '#1E3B33'
+  assign uid = uid | default: 'art' | handleize
+  case shape
+    when 'tumbler'
+      assign vb_y = 14
+      assign body = 'M56 128 H144 L133 362 C132 374 124 382 112 382 H88 C76 382 68 374 67 362 Z'
+    when 'jug'
+      assign vb_y = 54
+      assign body = 'M40 132 C40 112 56 104 72 104 H128 C144 104 160 112 160 132 V362 C160 374 151 382 139 382 H61 C49 382 40 374 40 362 Z'
+    when 'mug'
+      assign vb_y = 168
+      assign body = 'M54 196 H136 V360 C136 373 127 382 114 382 H76 C63 382 54 373 54 360 Z'
+    when 'lid'
+      assign vb_y = 130
+      assign body = 'M58 206 H142 V292 C142 302 135 308 126 308 H74 C65 308 58 302 58 292 Z'
+    when 'tin'
+      assign vb_y = 232
+      assign body = 'M52 300 H148 V366 C148 375 141 382 132 382 H68 C59 382 52 375 52 366 Z'
+    when 'sling'
+      assign vb_y = 50
+      assign body = 'M70 120 H130 V350 C130 366 122 374 108 374 H92 C78 374 70 366 70 350 Z'
+    else
+      assign vb_y = 0
+      assign body = 'M62 112 C62 92 78 84 86 80 H114 C122 84 138 92 138 112 V360 C138 373 129 382 116 382 H84 C71 382 62 373 62 360 Z'
+  endcase
+-%}
+<div class="art art--{{ shape }} {{ class }}" style="--art-color: {{ hex }};" data-art>
+  <svg viewBox="0 {{ vb_y }} 200 {{ 410 | minus: vb_y }}" preserveAspectRatio="xMidYMax meet" role="img" aria-label="{{ label | escape }}" focusable="false">
+    <defs>
+      <linearGradient id="shade-{{ uid }}" x1="0" x2="1" y1="0" y2="0">
+        <stop offset="0" stop-color="#fff" stop-opacity=".32"/>
+        <stop offset=".22" stop-color="#fff" stop-opacity=".06"/>
+        <stop offset=".6" stop-color="#000" stop-opacity="0"/>
+        <stop offset="1" stop-color="#000" stop-opacity=".28"/>
+      </linearGradient>
+    </defs>
+
+    <ellipse class="art__shadow" cx="100" cy="392" rx="{% if shape == 'jug' %}70{% else %}48{% endif %}" ry="8"/>
+
+    {%- case shape -%}
+      {%- when 'tumbler' -%}
+        <rect class="art__straw" x="112" y="22" width="8" height="96" rx="4" transform="rotate(8 116 70)"/>
+        <rect class="art__cap" x="50" y="104" width="100" height="26" rx="8"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- when 'jug' -%}
+        <path class="art__cap" d="M70 62 H130 V104 H70 Z"/>
+        <path class="art__strap" d="M158 156 C192 156 192 300 158 300" fill="none" stroke-width="14" stroke-linecap="round"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- when 'mug' -%}
+        <path class="art__strap" d="M134 230 C170 230 170 312 134 312" fill="none" stroke-width="13" stroke-linecap="round"/>
+        <rect class="art__cap" x="48" y="178" width="94" height="22" rx="7"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- when 'lid' -%}
+        <path class="art__strap" d="M78 206 C78 160 122 160 122 206" fill="none" stroke-width="10" stroke-linecap="round"/>
+        <rect class="art__straw" x="96" y="140" width="8" height="70" rx="4"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- when 'tin' -%}
+        <rect class="art__cap" x="46" y="270" width="108" height="34" rx="8"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- when 'sling' -%}
+        <path class="art__strap" d="M84 120 C30 60 170 60 116 120" fill="none" stroke-width="12" stroke-linecap="round"/>
+        <path class="art__body" d="{{ body }}"/>
+      {%- else -%}
+        <path class="art__strap" d="M80 40 C80 6 120 6 120 40" fill="none" stroke-width="9" stroke-linecap="round"/>
+        <rect class="art__cap" x="72" y="34" width="56" height="44" rx="9"/>
+        <path class="art__body" d="{{ body }}"/>
+    {%- endcase -%}
+
+    <path d="{{ body }}" fill="url(#shade-{{ uid }})" pointer-events="none"/>
+
+    {%- unless shape == 'lid' or shape == 'sling' or shape == 'tin' -%}
+      <g class="art__stamp" transform="translate({% if shape == 'mug' %}86 262{% else %}86 220{% endif %}) scale(.9)">
+        <path d="M16 3 L10.5 12 H13.5 L8.5 19 H12 L7 26 H25 L20 19 H23.5 L18.5 12 H21.5 Z"/>
+      </g>
+    {%- endunless -%}
+  </svg>
+</div>

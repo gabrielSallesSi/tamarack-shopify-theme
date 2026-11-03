@@ -1,0 +1,17 @@
+{
+  "type": "footer",
+  "name": "Footer group",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "tagline": "Vacuum-insulated steel for long days outside. Built to be dropped, scraped and refilled for years.",
+        "menu": "footer",
+        "show_big_word": true
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

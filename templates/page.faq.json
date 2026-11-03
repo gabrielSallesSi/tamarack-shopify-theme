@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-faq",
+      "settings": {},
+      "blocks": {
+        "q1": { "type": "question", "settings": { "topic": "The flask", "question": "How long does it keep drinks cold or hot?", "answer": "<p>Ice water stays under 6°C for 24 hours. Coffee poured at 92°C is still around 62°C after 12 hours, with the stopper closed.</p>" } },
+        "q2": { "type": "question", "settings": { "topic": "The flask", "question": "Does the cap work as a cup?", "answer": "<p>Yes. The steel cap unscrews and holds a hot pour, so you can share without a second mug.</p>" } },
+        "q3": { "type": "question", "settings": { "topic": "The flask", "question": "Is it safe for carbonated drinks?", "answer": "<p>Yes. The stopper holds pressure, but open it slowly after a bumpy hike.</p>" } },
+        "q4": { "type": "question", "settings": { "topic": "Care", "question": "Can I put it in the dishwasher?", "answer": "<p>The cup lid, yes. Hand wash the body so the powder coat lasts.</p>" } },
+        "q5": { "type": "question", "settings": { "topic": "Orders", "question": "How does the bundle discount work?", "answer": "<p>Two flasks save 10% and three save 15%. Colors can be mixed, and the savings apply at checkout.</p>" } },
+        "q6": { "type": "question", "settings": { "topic": "Orders", "question": "Can I return it?", "answer": "<p>Take it on the trail for 30 days. If it isn't for you, send it back and the return is free.</p>" } },
+        "q7": { "type": "question", "settings": { "topic": "Orders", "question": "What does the warranty cover?", "answer": "<p>The vacuum seal, for life. If the flask stops holding temperature, it gets replaced.</p>" } }
+      },
+      "block_order": ["q1", "q2", "q3", "q4", "q5", "q6", "q7"]
+    }
+  },
+  "order": ["main"]
+}

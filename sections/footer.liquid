@@ -1,0 +1,65 @@
+{%- assign menu = linklists[section.settings.menu] -%}
+<footer class="site-footer">
+  <div class="page-width site-footer__grid">
+    <div class="site-footer__brand">
+      <a href="{{ routes.root_url }}" class="wordmark wordmark--light">
+        {% render 'logo-mark' %}
+        <span class="wordmark__text">{{ shop.name | escape }}</span>
+      </a>
+      {%- if section.settings.tagline != blank -%}
+        <p class="site-footer__tagline">{{ section.settings.tagline | escape }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- if menu.links.size > 0 -%}
+      <nav class="site-footer__nav" aria-label="Footer">
+        <h2 class="site-footer__heading">{{ menu.title | escape }}</h2>
+        <ul role="list">
+          {%- for link in menu.links -%}
+            <li><a href="{{ link.url }}">{{ link.title | escape }}</a></li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
+
+    <div class="site-footer__nav">
+      <h2 class="site-footer__heading">Follow the trail</h2>
+      <ul role="list">
+        {%- if settings.social_instagram != blank -%}<li><a href="{{ settings.social_instagram }}" rel="noopener" target="_blank">Instagram</a></li>{%- endif -%}
+        {%- if settings.social_youtube != blank -%}<li><a href="{{ settings.social_youtube }}" rel="noopener" target="_blank">YouTube</a></li>{%- endif -%}
+        <li><a href="{{ routes.all_products_collection_url }}">All products</a></li>
+      </ul>
+    </div>
+  </div>
+
+  {%- if section.settings.show_big_word -%}
+    {%- assign big_letters = shop.name | split: '' -%}
+    <div class="footer-word" data-text-pressure aria-hidden="true">
+      {%- for letter in big_letters -%}<span class="footer-word__char">{{ letter }}</span>{%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  <div class="page-width site-footer__base">
+    <p>&copy; {{ 'now' | date: '%Y' }} {{ shop.name | escape }}. Portfolio demo theme, built from scratch in Liquid.</p>
+    {%- if section.settings.show_payment_icons -%}
+      <ul class="payment-icons" role="list" aria-label="Payment methods">
+        {%- for type in shop.enabled_payment_types -%}
+          <li>{{ type | payment_type_svg_tag: class: 'payment-icon' }}</li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "class": "section-footer",
+  "settings": [
+    { "type": "textarea", "id": "tagline", "label": "Tagline", "default": "Vacuum-insulated steel for long days outside." },
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "footer" },
+    { "type": "checkbox", "id": "show_payment_icons", "label": "Show payment icons", "default": true },
+    { "type": "checkbox", "id": "show_big_word", "label": "Show giant store name", "info": "Letters stretch and thicken near the cursor, adapted from React Bits TextPressure.", "default": true }
+  ]
+}
+{% endschema %}

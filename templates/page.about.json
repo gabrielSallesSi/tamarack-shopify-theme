@@ -1,0 +1,43 @@
+{
+  "sections": {
+    "story": {
+      "type": "story",
+      "blocks": {
+        "f1": { "type": "fact", "settings": { "label": "Capacity", "value": "1.2 L" } },
+        "f2": { "type": "fact", "settings": { "label": "Cold", "value": "24 h" } },
+        "f3": { "type": "fact", "settings": { "label": "Hot", "value": "12 h" } },
+        "f4": { "type": "fact", "settings": { "label": "Seal warranty", "value": "Lifetime" } }
+      },
+      "block_order": ["f1", "f2", "f3", "f4"],
+      "settings": {}
+    },
+    "photo": {
+      "type": "photo-break",
+      "settings": {
+        "photo_url": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5",
+        "photo_alt": "Dark pine forest wrapped in low fog",
+        "heading": "Tested where the trail runs out.",
+        "text": "Every color is the same flask: double-wall 18/8 steel, a quarter-turn stopper and a powder coat that takes a beating.",
+        "button_label": "Shop the flask",
+        "height": 75,
+        "shade": 55,
+        "align": "left",
+        "photo_position": "center center",
+        "grade": "twilight",
+        "fog": true
+      }
+    },
+    "bento": {
+      "type": "magic-bento",
+      "settings": { "product": "expedition-flask", "heading": "What goes into it" },
+      "blocks": {
+        "c1": { "type": "card", "settings": { "label": "Capacity", "title": "1.2 L", "text": "Enough for two on a long trail." } },
+        "c2": { "type": "card", "settings": { "label": "Cup lid", "title": "Pour into the cap", "text": "The steel cap unscrews into a cup." } },
+        "c3": { "type": "card", "settings": { "label": "Steel", "title": "18/8, double wall", "text": "Vacuum insulated, with a lifetime warranty on the seal." } }
+      },
+      "block_order": ["c1", "c2", "c3"]
+    },
+    "newsletter": { "type": "newsletter", "settings": {} }
+  },
+  "order": ["story", "photo", "bento", "newsletter"]
+}

@@ -1,0 +1,125 @@
+<section class="section account">
+  <div class="page-width page-width--narrow">
+    {%- case template.name -%}
+      {%- when 'login' -%}
+        <h1 class="page-title">Sign in</h1>
+        {%- form 'customer_login', class: 'stack' -%}
+          {{ form.errors | default_errors }}
+          <label for="LoginEmail">Email</label>
+          <input id="LoginEmail" type="email" name="customer[email]" class="field" autocomplete="email" required>
+          <label for="LoginPassword">Password</label>
+          <input id="LoginPassword" type="password" name="customer[password]" class="field" autocomplete="current-password" required>
+          <button type="submit" class="button button--primary">Sign in</button>
+          <a href="{{ routes.account_register_url }}" class="text-link">Create an account</a>
+        {%- endform -%}
+        <details class="accordion">
+          <summary class="accordion__summary"><span>Forgot your password?</span>{% render 'icon', icon: 'plus' %}</summary>
+          <div class="accordion__content">
+            {%- form 'recover_customer_password', class: 'stack' -%}
+              {{ form.errors | default_errors }}
+              {%- if form.posted_successfully? -%}<p role="status">Check your email for a reset link.</p>{%- endif -%}
+              <label for="RecoverEmail">Email</label>
+              <input id="RecoverEmail" type="email" name="email" class="field" autocomplete="email" required>
+              <button type="submit" class="button">Send reset link</button>
+            {%- endform -%}
+          </div>
+        </details>
+
+      {%- when 'register' -%}
+        <h1 class="page-title">Create account</h1>
+        {%- form 'create_customer', class: 'stack' -%}
+          {{ form.errors | default_errors }}
+          <label for="RegFirst">First name</label>
+          <input id="RegFirst" type="text" name="customer[first_name]" class="field" autocomplete="given-name">
+          <label for="RegLast">Last name</label>
+          <input id="RegLast" type="text" name="customer[last_name]" class="field" autocomplete="family-name">
+          <label for="RegEmail">Email</label>
+          <input id="RegEmail" type="email" name="customer[email]" class="field" autocomplete="email" required>
+          <label for="RegPassword">Password</label>
+          <input id="RegPassword" type="password" name="customer[password]" class="field" autocomplete="new-password" required>
+          <button type="submit" class="button button--primary">Create account</button>
+        {%- endform -%}
+
+      {%- when 'activate_account' -%}
+        <h1 class="page-title">Activate account</h1>
+        {%- form 'activate_customer_password', class: 'stack' -%}
+          {{ form.errors | default_errors }}
+          <label for="ActivatePassword">Password</label>
+          <input id="ActivatePassword" type="password" name="customer[password]" class="field" autocomplete="new-password" required>
+          <label for="ActivateConfirm">Confirm password</label>
+          <input id="ActivateConfirm" type="password" name="customer[password_confirmation]" class="field" autocomplete="new-password" required>
+          <button type="submit" class="button button--primary">Activate account</button>
+        {%- endform -%}
+
+      {%- when 'reset_password' -%}
+        <h1 class="page-title">Reset password</h1>
+        {%- form 'reset_customer_password', class: 'stack' -%}
+          {{ form.errors | default_errors }}
+          <label for="ResetPassword">New password</label>
+          <input id="ResetPassword" type="password" name="customer[password]" class="field" autocomplete="new-password" required>
+          <label for="ResetConfirm">Confirm password</label>
+          <input id="ResetConfirm" type="password" name="customer[password_confirmation]" class="field" autocomplete="new-password" required>
+          <button type="submit" class="button button--primary">Reset password</button>
+        {%- endform -%}
+
+      {%- when 'addresses' -%}
+        <h1 class="page-title">Addresses</h1>
+        {%- for address in customer.addresses -%}
+          <div class="address">
+            {{ address | format_address }}
+            {%- form 'customer_address', address, class: 'inline-form' -%}
+              <input type="hidden" name="_method" value="delete">
+              <button type="submit" class="text-link">Delete</button>
+            {%- endform -%}
+          </div>
+        {%- endfor -%}
+        {%- form 'customer_address', customer.new_address, class: 'stack' -%}
+          {{ form.errors | default_errors }}
+          <label for="AddrAddress1">Address</label>
+          <input id="AddrAddress1" type="text" name="address[address1]" class="field" autocomplete="address-line1">
+          <label for="AddrCity">City</label>
+          <input id="AddrCity" type="text" name="address[city]" class="field" autocomplete="address-level2">
+          <label for="AddrCountry">Country</label>
+          <select id="AddrCountry" name="address[country]" class="field field--select">{{ all_country_option_tags }}</select>
+          <label for="AddrZip">Postal code</label>
+          <input id="AddrZip" type="text" name="address[zip]" class="field" autocomplete="postal-code">
+          <button type="submit" class="button button--primary">Add address</button>
+        {%- endform -%}
+        <a href="{{ routes.account_url }}" class="text-link">Back to account</a>
+
+      {%- when 'order' -%}
+        <h1 class="page-title">Order {{ order.name }}</h1>
+        <p class="card__meta">{{ order.created_at | time_tag: format: 'date' }}</p>
+        <ul class="lines" role="list">
+          {%- for line_item in order.line_items -%}
+            <li class="order-line"><span>{{ line_item.title | escape }} &times; {{ line_item.quantity }}</span><span>{{ line_item.final_line_price | money }}</span></li>
+          {%- endfor -%}
+        </ul>
+        <p class="drawer__subtotal"><span>Total</span><span>{{ order.total_price | money }}</span></p>
+        <a href="{{ routes.account_url }}" class="text-link">Back to account</a>
+
+      {%- else -%}
+        <h1 class="page-title">Account</h1>
+        <p>Signed in as {{ customer.email }}. <a href="{{ routes.account_logout_url }}" class="text-link">Sign out</a></p>
+        <h2 class="section-title section-title--small">Orders</h2>
+        {%- paginate customer.orders by 20 -%}
+          <ul class="lines" role="list">
+            {%- for order in customer.orders -%}
+              <li class="order-line"><a href="{{ order.customer_url }}" class="text-link">{{ order.name }}</a><span>{{ order.total_price | money }}</span></li>
+            {%- else -%}
+              <li class="empty-note">No orders yet.</li>
+            {%- endfor -%}
+          </ul>
+        {%- endpaginate -%}
+        <a href="{{ routes.account_addresses_url }}" class="text-link">Manage addresses ({{ customer.addresses_count }})</a>
+    {%- endcase -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Customer account",
+  "class": "section-main-customers",
+  "settings": []
+}
+{% endschema %}

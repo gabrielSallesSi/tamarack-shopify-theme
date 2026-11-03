@@ -1,0 +1,69 @@
+{%- liquid
+  assign upsell = settings.cart_upsell_product
+  assign upsell_in_cart = false
+  if upsell != blank
+    for item in cart.items
+      if item.product_id == upsell.id
+        assign upsell_in_cart = true
+      endif
+    endfor
+  endif
+-%}
+<div class="drawer" data-cart-drawer data-count="{{ cart.item_count }}" hidden>
+  <div class="drawer__overlay" data-drawer-close></div>
+  <div class="bars-loader" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+  <div class="drawer__panel" role="dialog" aria-modal="true" aria-labelledby="CartDrawerTitle" tabindex="-1">
+    <div class="drawer__head">
+      <h2 id="CartDrawerTitle" class="drawer__title">Your cart <span class="drawer__count">({{ cart.item_count }})</span></h2>
+      <button type="button" class="icon-button" data-drawer-close aria-label="Close cart">{% render 'icon', icon: 'close' %}</button>
+    </div>
+
+    {%- if cart.item_count > 0 -%}
+      {% render 'cart-progress' %}
+      <ul class="lines" role="list">
+        {%- for item in cart.items -%}
+          {% render 'cart-line', item: item, index: forloop.index, uid_prefix: 'drawer' %}
+        {%- endfor -%}
+      </ul>
+
+      {%- if upsell != blank and upsell_in_cart == false and upsell.available -%}
+        <div class="upsell">
+          <div class="upsell__media">{% render 'product-media', product: upsell, uid: 'upsell', sizes: '72px' %}</div>
+          <div class="upsell__body">
+            <p class="upsell__lede">Pairs with your bottle</p>
+            <p class="upsell__title">{{ upsell.title | escape }}</p>
+            <p class="upsell__price">{{ upsell.selected_or_first_available_variant.price | money }}</p>
+          </div>
+          <button type="button" class="button button--small" data-upsell-add="{{ upsell.selected_or_first_available_variant.id }}">Add</button>
+        </div>
+      {%- endif -%}
+
+      <div class="drawer__foot">
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          <ul class="drawer__discounts" role="list">
+            {%- for discount in cart.cart_level_discount_applications -%}
+              <li>{{ discount.title | escape }} <span>-{{ discount.total_allocated_amount | money }}</span></li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+        <p class="drawer__subtotal"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></p>
+        <p class="drawer__fine">Bundle savings and shipping are calculated at checkout.</p>
+        <form action="{{ routes.cart_url }}" method="post">
+          <button type="submit" name="checkout" class="button button--primary button--block">Check out</button>
+        </form>
+      </div>
+    {%- else -%}
+      <div class="drawer__empty">
+        <p>Your cart is empty. Start with the bottle most people carry.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="button button--primary">Shop bottles</a>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": []
+}
+{% endschema %}

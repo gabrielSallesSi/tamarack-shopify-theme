@@ -1,0 +1,18 @@
+{%- comment -%} Params: product, variant (optional) {%- endcomment -%}
+{%- liquid
+  assign target = variant | default: product.selected_or_first_available_variant
+  assign on_sale = false
+  if target.compare_at_price > target.price
+    assign on_sale = true
+  endif
+-%}
+<div class="price{% if on_sale %} price--sale{% endif %}" data-price>
+  {%- if product.price_varies and variant == blank -%}
+    <span class="price__current">From {{ product.price_min | money }}</span>
+  {%- else -%}
+    <span class="price__current" data-price-current>{{ target.price | money }}</span>
+    {%- if on_sale -%}
+      <s class="price__compare" data-price-compare>{{ target.compare_at_price | money }}</s>
+    {%- endif -%}
+  {%- endif -%}
+</div>

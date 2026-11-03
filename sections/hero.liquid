@@ -1,0 +1,166 @@
+{%- liquid
+  assign hero_product = section.settings.product
+  assign color_index = -1
+  assign start_variant = blank
+  if hero_product != blank
+    assign start_variant = hero_product.selected_or_first_available_variant
+    for option in hero_product.options_with_values
+      assign option_name = option.name | downcase
+      if option_name == 'color' or option_name == 'colour'
+        assign color_index = forloop.index0
+        assign color_option = option
+      endif
+    endfor
+    if color_index >= 0 and section.settings.start_color != blank
+      for v in hero_product.variants
+        if v.options[color_index] == section.settings.start_color
+          assign start_variant = v
+          break
+        endif
+      endfor
+    endif
+  endif
+  assign cta_url = routes.all_products_collection_url
+  if start_variant != blank
+    assign cta_url = start_variant.url
+  endif
+  assign words = section.settings.rotating_words | split: ','
+  assign first_word = words | first | strip
+  assign lead_words = section.settings.heading | split: ' '
+-%}
+<section class="hero hero--photo{% if section.settings.grade == 'twilight' %} hero--twilight{% endif %}" data-hero>
+  <div class="hero__stage">
+    <div class="hero__photo" data-hero-photo>
+      {%- capture photo_alt -%}{{ section.settings.photo_alt }}{%- endcapture -%}
+      {% render 'nature-photo', image: section.settings.photo, url: section.settings.photo_url, alt: photo_alt, class: 'hero__photo-img', loading: 'eager', position: section.settings.photo_position %}
+      <span class="hero__shade" style="--shade: {{ section.settings.shade | divided_by: 100.0 }};" aria-hidden="true"></span>
+    </div>
+    {%- if section.settings.grade == 'twilight' -%}
+      <span class="hero__grade" aria-hidden="true"></span>
+    {%- endif -%}
+    {%- if section.settings.fog -%}
+      <span class="hero__fog hero__fog--a" aria-hidden="true"></span>
+      <span class="hero__fog hero__fog--b" aria-hidden="true"></span>
+    {%- endif -%}
+
+  <div class="page-width hero__grid">
+    <div class="hero__copy">
+      <h1 class="hero__title">
+        <span class="visually-hidden">{{ section.settings.heading | escape }} {{ first_word | escape }}</span>
+        <span class="blur-text" aria-hidden="true">
+          {%- for word in lead_words -%}
+            <span class="blur-text__word" style="--i: {{ forloop.index0 }};">{{ word | escape }}</span>{% unless forloop.last %} {% endunless %}
+          {%- endfor -%}
+        </span>
+        <span class="rotator" data-rotator aria-hidden="true" style="--i: {{ lead_words.size }};">
+          {%- for word in words -%}
+            <span class="rotator__word{% if forloop.first %} is-active{% endif %}">{{ word | strip | escape }}</span>
+          {%- endfor -%}
+        </span>
+      </h1>
+      {%- if section.settings.text != blank -%}
+        <div class="hero__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+      <div class="hero__actions">
+        <span class="magnet" data-magnet>
+          <a href="{{ cta_url }}" class="button button--primary button--shimmer" data-hero-cta>{{ section.settings.button_label | escape }}</a>
+        </span>
+        {%- if section.settings.secondary_label != blank -%}
+          <a href="{{ section.settings.secondary_link | default: routes.all_products_collection_url }}" class="button button--ghost">{{ section.settings.secondary_label | escape }}</a>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="hero__product">
+      {%- capture start_hex -%}{% render 'color-hex', name: start_variant.options[color_index] %}{%- endcapture -%}
+      <div class="hero__bottle" style="--glow: {{ start_hex | strip | default: '#D55825' }}; --nudge: {{ section.settings.nudge }}%;">
+        <span class="hero__glow" data-glow aria-hidden="true"></span>
+        <span class="hero__ground" aria-hidden="true"></span>
+        <div class="hero__float">
+          {%- if hero_product != blank -%}
+            {% render 'product-media', product: hero_product, variant: start_variant, uid: 'hero', class: 'hero__art', loading: 'eager', sizes: '(min-width: 990px) 40vw, 80vw' %}
+          {%- else -%}
+            {% render 'product-art', shape: 'bottle', hex: '#D55825', uid: 'hero', label: 'Insulated flask', class: 'hero__art' %}
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if color_index >= 0 -%}
+        <div class="hero__picker">
+          <p class="hero__picker-label">Color: <span data-hero-color>{{ start_variant.options[color_index] }}</span></p>
+          <div class="swatches" role="group" aria-label="Preview colors">
+            {%- for value in color_option.values -%}
+              {%- liquid
+                assign value_variant = hero_product.variants | where: 'option1', value | first
+                if color_index == 1
+                  assign value_variant = hero_product.variants | where: 'option2', value | first
+                elsif color_index == 2
+                  assign value_variant = hero_product.variants | where: 'option3', value | first
+                endif
+                assign swatch_active = false
+                if value == start_variant.options[color_index]
+                  assign swatch_active = true
+                endif
+              -%}
+              {% render 'swatch', value: value, url: value_variant.url, active: swatch_active, size: 'large', attr: 'data-hero-swatch' %}
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  </div>
+
+  {%- if section.settings.show_retention -%}
+    <div class="page-width hero__track">
+      {% render 'retention-track',
+        cold_hours: section.settings.cold_hours,
+        cold_temp: section.settings.cold_temp,
+        hot_hours: section.settings.hot_hours,
+        hot_temp: section.settings.hot_temp
+      %}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "class": "section-hero",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "info": "The rotating word is added at the end.", "default": "Still cold at the" },
+    { "type": "text", "id": "rotating_words", "label": "Rotating words", "info": "Separate with commas.", "default": "summit.,crag.,trailhead.,last camp." },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>One vacuum flask in four colors. Ice for a full day on the trail, coffee hot through a long morning at camp.</p>" },
+    { "type": "product", "id": "product", "label": "Featured product" },
+    { "type": "text", "id": "start_color", "label": "Color shown first", "default": "Blaze" },
+    { "type": "range", "id": "nudge", "label": "Shift product photo right", "info": "Centers the bottle body over the color picker when the photo has a handle on one side.", "min": 0, "max": 20, "step": 1, "unit": "%", "default": 12 },
+    { "type": "text", "id": "button_label", "label": "Button label", "default": "Shop the flask" },
+    { "type": "text", "id": "secondary_label", "label": "Secondary button label", "default": "See the details" },
+    { "type": "url", "id": "secondary_link", "label": "Secondary button link" },
+    { "type": "header", "content": "Background photo" },
+    { "type": "image_picker", "id": "photo", "label": "Photo", "info": "Leave empty to use the photo link below." },
+    { "type": "text", "id": "photo_url", "label": "Photo link", "info": "Unsplash image link used when no photo is uploaded.", "default": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5" },
+    { "type": "text", "id": "photo_alt", "label": "Photo description", "default": "Dark pine forest wrapped in low fog" },
+    { "type": "select", "id": "photo_position", "label": "Photo focus", "default": "center 35%", "options": [
+      { "value": "center 20%", "label": "Top" },
+      { "value": "center 35%", "label": "Upper middle" },
+      { "value": "center center", "label": "Center" },
+      { "value": "center bottom", "label": "Bottom" }
+    ] },
+    { "type": "range", "id": "shade", "label": "Darken behind text", "min": 0, "max": 90, "step": 5, "unit": "%", "default": 45 },
+    { "type": "select", "id": "grade", "label": "Color grade", "default": "twilight", "options": [
+      { "value": "none", "label": "Natural" },
+      { "value": "twilight", "label": "Cold forest (blue-green, moody)" }
+    ] },
+    { "type": "checkbox", "id": "fog", "label": "Drifting fog", "default": true },
+    { "type": "header", "content": "Temperature track" },
+    { "type": "checkbox", "id": "show_retention", "label": "Show temperature track", "default": true },
+    { "type": "number", "id": "cold_hours", "label": "Cold retention (hours)", "default": 24 },
+    { "type": "number", "id": "cold_temp", "label": "Water temperature at the end (°C)", "default": 6 },
+    { "type": "number", "id": "hot_hours", "label": "Hot retention (hours)", "default": 12 },
+    { "type": "number", "id": "hot_temp", "label": "Coffee temperature at the end (°C)", "default": 62 }
+  ],
+  "presets": [{ "name": "Hero" }]
+}
+{% endschema %}

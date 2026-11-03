@@ -1,0 +1,303 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "product": "expedition-flask",
+        "heading": "Still cold at the",
+        "rotating_words": "summit.,crag.,trailhead.,last camp.",
+        "start_color": "Blaze",
+        "button_label": "Shop the flask",
+        "secondary_label": "See the details",
+        "show_retention": true,
+        "photo_url": "https://images.unsplash.com/photo-1506452305024-9d3f02d1c9b5",
+        "photo_alt": "Dark pine forest wrapped in low fog",
+        "photo_position": "center center",
+        "shade": 45,
+        "grade": "twilight",
+        "fog": true
+      }
+    },
+    "spec": {
+      "type": "spec-sheet",
+      "blocks": {
+        "s1": {
+          "type": "spec",
+          "settings": {
+            "label": "Steel",
+            "value": "18/8 food-grade stainless, double wall"
+          }
+        },
+        "s2": {
+          "type": "spec",
+          "settings": {
+            "label": "Insulation",
+            "value": "Vacuum gap with copper-plated inner wall"
+          }
+        },
+        "s3": {
+          "type": "spec",
+          "settings": {
+            "label": "Finish",
+            "value": "Textured powder coat, no condensation"
+          }
+        },
+        "s4": {
+          "type": "spec",
+          "settings": {
+            "label": "Lid",
+            "value": "Leakproof screw cap, one-finger carry loop"
+          }
+        },
+        "s5": {
+          "type": "spec",
+          "settings": {
+            "label": "Mouth",
+            "value": "Fits standard ice cubes and a cleaning brush"
+          }
+        },
+        "s6": {
+          "type": "spec",
+          "settings": {
+            "label": "Care",
+            "value": "Dishwasher-safe lid, hand wash the body"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4",
+        "s5",
+        "s6"
+      ],
+      "settings": {}
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Can I put it in the dishwasher?",
+            "answer": "<p>The lid, yes. Hand wash the body so the powder coat lasts.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Does it work with carbonated drinks?",
+            "answer": "<p>Yes. The screw cap holds pressure, but open it slowly after a bumpy hike.</p>"
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Will it fit my cup holder?",
+            "answer": "<p>No. At 1.2 L it rides in a pack side pocket or on the carry handle. The base fits most bike bottle cages.</p>"
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "How does the bundle discount work?",
+            "answer": "<p>Buy two of anything and save 10%. Buy three and save 15%. Colors and sizes can be mixed.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4"
+      ],
+      "settings": {}
+    },
+    "newsletter": {
+      "type": "newsletter",
+      "settings": {
+        "paths": true,
+        "photo_url": "https://images.unsplash.com/photo-1640022578188-063cf5ffe1b5"
+      }
+    },
+    "marquee": {
+      "type": "marquee",
+      "blocks": {
+        "m1": {
+          "type": "item",
+          "settings": {
+            "text": "Ice for 24 hours"
+          }
+        },
+        "m2": {
+          "type": "item",
+          "settings": {
+            "text": "Coffee hot for 12"
+          }
+        },
+        "m3": {
+          "type": "item",
+          "settings": {
+            "text": "Free shipping over $75"
+          }
+        },
+        "m4": {
+          "type": "item",
+          "settings": {
+            "text": "30-day trail test"
+          }
+        },
+        "m5": {
+          "type": "item",
+          "settings": {
+            "text": "Lifetime warranty on every bottle"
+          }
+        }
+      },
+      "block_order": [
+        "m1",
+        "m2",
+        "m3",
+        "m4",
+        "m5"
+      ],
+      "settings": {
+        "style": "blaze",
+        "duration": 40,
+        "label": "Why people carry Tamarack"
+      }
+    },
+    "colors": {
+      "type": "color-swap",
+      "settings": {
+        "product": "expedition-flask"
+      }
+    },
+    "anatomy": {
+      "type": "anatomy",
+      "blocks": {
+        "h1": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Cup lid",
+            "text": "The steel cap unscrews into a 6 oz cup, so you never pour into a cold mug.",
+            "x": 40,
+            "y": 9
+          }
+        },
+        "h2": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Glove-friendly handle",
+            "text": "Wide enough for a gloved hand and it folds flat against the body.",
+            "x": 80,
+            "y": 40
+          }
+        },
+        "h3": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Double steel walls",
+            "text": "A vacuum gap between two layers of 18/8 steel keeps heat where you put it.",
+            "x": 38,
+            "y": 56
+          }
+        },
+        "h4": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Rubber base",
+            "text": "A grippy boot that keeps the flask quiet and upright on rock.",
+            "x": 42,
+            "y": 92
+          }
+        }
+      },
+      "block_order": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+      ],
+      "settings": {
+        "product": "expedition-flask",
+        "color": "Spruce"
+      }
+    },
+    "photo_break": {
+      "type": "photo-break",
+      "blocks": {
+        "log1": { "type": "entry", "settings": { "when": "Poured", "what": "Coffee goes in at the trailhead", "value": 92, "unit": "°C", "tone": "hot" } },
+        "log2": { "type": "entry", "settings": { "when": "12 h later", "what": "Still hot enough to warm your hands", "value": 62, "unit": "°C", "tone": "hot" } },
+        "log3": { "type": "entry", "settings": { "when": "Iced, 24 h", "what": "Ice water stays under this all day", "value": 6, "unit": "°C", "tone": "cold" } }
+      },
+      "block_order": ["log1", "log2", "log3"],
+      "settings": {
+        "photo_url": "https://images.unsplash.com/photo-1675702662605-57e37a8cb2c3",
+        "product": "expedition-flask",
+        "product_color": "Spruce",
+        "log_eyebrow": "Inside the flask",
+        "photo_alt": "Pine-covered mountainside wrapped in heavy fog",
+        "grade": "twilight",
+        "fog": true,
+        "heading": "Made for days that end above the tree line.",
+        "text": "Fill it at the trailhead, forget about it until the ridge.",
+        "button_label": "Shop the flask",
+        "height": 85,
+        "shade": 55,
+        "align": "left",
+        "photo_position": "center center"
+      }
+    },
+    "bento": {
+      "type": "magic-bento",
+      "blocks": {
+        "c1": {
+          "type": "card",
+          "settings": {
+            "label": "Capacity",
+            "title": "1.2 L",
+            "text": "Enough for two on a long trail."
+          }
+        },
+        "c2": {
+          "type": "card",
+          "settings": {
+            "label": "Cup lid",
+            "title": "Pour into the cap",
+            "text": "The steel cap unscrews into a 6 oz cup."
+          }
+        },
+        "c3": {
+          "type": "card",
+          "settings": {
+            "label": "Steel",
+            "title": "18/8, double wall",
+            "text": "Vacuum insulated, with a lifetime warranty on the seal."
+          }
+        }
+      },
+      "block_order": [
+        "c1",
+        "c2",
+        "c3"
+      ],
+      "settings": {
+        "product": "expedition-flask",
+        "product_color": "Spruce"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "marquee",
+    "bento",
+    "photo_break",
+    "colors",
+    "anatomy",
+    "spec",
+    "faq",
+    "newsletter"
+  ]
+}

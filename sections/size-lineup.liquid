@@ -1,0 +1,84 @@
+<section class="section lineup" aria-labelledby="lineup-{{ section.id }}">
+  <div class="page-width">
+    <div class="section-head">
+      <h2 id="lineup-{{ section.id }}" class="section-title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-lede">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+    </div>
+    <ol class="lineup__row" role="list">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign item = block.settings.product
+          assign item_variant = blank
+          if item != blank and block.settings.color != blank
+            assign item_variant = item.variants | where: 'option1', block.settings.color | first
+          endif
+          capture item_hex
+            render 'color-hex', name: block.settings.color
+          endcapture
+        -%}
+        <li class="lineup__item" style="--scale: {{ block.settings.scale | divided_by: 100.0 }};" {{ block.shopify_attributes }}>
+          <a href="{{ item.url | default: routes.all_products_collection_url }}" class="lineup__link">
+            <div class="lineup__stand">
+            <div class="lineup__art">
+              {%- if item != blank -%}
+                {%- assign lineup_uid = 'lineup-' | append: block.id -%}
+                {% render 'product-media', product: item, variant: item_variant, uid: lineup_uid, sizes: '25vw' %}
+              {%- else -%}
+                {%- assign lineup_uid = 'lineup-' | append: block.id -%}
+                {% render 'product-art', shape: block.settings.shape, hex: item_hex, uid: lineup_uid, label: block.settings.title %}
+              {%- endif -%}
+            </div>
+            </div>
+            <h3 class="lineup__title">{{ item.title | default: block.settings.title | escape }}</h3>
+            <p class="lineup__capacity">{{ block.settings.capacity | escape }}</p>
+            <p class="lineup__use">{{ block.settings.use_case | escape }}</p>
+          </a>
+        </li>
+      {%- endfor -%}
+    </ol>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Size lineup",
+  "class": "section-lineup",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Sized by how long you're out" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Shown at true relative height." }
+  ],
+  "blocks": [
+    {
+      "type": "item",
+      "name": "Product",
+      "settings": [
+        { "type": "product", "id": "product", "label": "Product" },
+        { "type": "text", "id": "title", "label": "Title (when no product is picked)", "default": "Summit Bottle" },
+        { "type": "select", "id": "shape", "label": "Shape (when no product is picked)", "default": "bottle", "options": [
+          { "value": "bottle", "label": "Bottle" },
+          { "value": "tumbler", "label": "Tumbler" },
+          { "value": "jug", "label": "Jug" },
+          { "value": "mug", "label": "Mug" }
+        ] },
+        { "type": "text", "id": "color", "label": "Color to show", "info": "Must match one of the product's color names, like Blaze.", "default": "Spruce" },
+        { "type": "text", "id": "capacity", "label": "Capacity", "default": "32 oz / 946 ml" },
+        { "type": "text", "id": "use_case", "label": "Best for", "default": "A full day hike" },
+        { "type": "range", "id": "scale", "label": "Relative height", "min": 30, "max": 100, "step": 5, "unit": "%", "default": 80 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size lineup",
+      "blocks": [
+        { "type": "item", "settings": { "title": "Trail Mug", "shape": "mug", "color": "Blaze", "capacity": "12 oz / 355 ml", "use_case": "Coffee at the trailhead", "scale": 45 } },
+        { "type": "item", "settings": { "title": "Ridge Tumbler", "shape": "tumbler", "color": "Glacier", "capacity": "20 oz / 591 ml", "use_case": "The drive out", "scale": 65 } },
+        { "type": "item", "settings": { "title": "Summit Bottle", "shape": "bottle", "color": "Spruce", "capacity": "32 oz / 946 ml", "use_case": "A full day hike", "scale": 80 } },
+        { "type": "item", "settings": { "title": "Basecamp Jug", "shape": "jug", "color": "Granite", "capacity": "64 oz / 1.9 L", "use_case": "Group camp, two nights", "scale": 100 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

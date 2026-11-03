@@ -1,0 +1,474 @@
+{%- liquid
+  assign current_variant = product.selected_or_first_available_variant
+  assign form_id = 'ProductForm-' | append: section.id
+
+  assign color_index = -1
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'color' or option_name == 'colour'
+      assign color_index = forloop.index0
+      assign color_option = option
+    endif
+  endfor
+
+  assign image_media = product.media | where: 'media_type', 'image'
+  assign model_media = product.media | where: 'media_type', 'model'
+  assign current_color = ''
+  if color_index >= 0
+    assign current_color = current_variant.options[color_index] | handleize
+  endif
+
+  comment
+    Color products with a photo per color (variant images, or bundled asset photos) use the color stack:
+    the swatches crossfade between photos and the thumbnails pick a color. Other products use a plain gallery.
+  endcomment
+  assign color_stack = false
+  if color_index >= 0
+    if product.tags contains 'asset-photos'
+      assign color_stack = true
+    endif
+    for v in product.variants
+      if v.featured_media != blank
+        assign color_stack = true
+        break
+      endif
+    endfor
+  endif
+
+  assign use_art = settings.prefer_product_art
+  if image_media.size == 0 or color_stack
+    assign use_art = true
+  endif
+
+  assign bundle_block = section.blocks | where: 'type', 'bundle' | first
+-%}
+
+<section class="product" data-product-section data-section-id="{{ section.id }}" data-url="{{ product.url }}">
+  <div class="page-width product__grid">
+    <div class="product__gallery">
+      <div class="product__stage" data-product-stage data-lens>
+        <div class="product__topo">{% render 'topo' %}</div>
+        {%- if use_art -%}
+          {% render 'product-media', product: product, variant: current_variant, uid: 'pdp', class: 'product__art', loading: 'eager' %}
+        {%- else -%}
+          {%- assign featured = current_variant.featured_media | default: image_media.first -%}
+          <div class="product__photo" data-main-media>
+            {{ featured.preview_image | image_url: width: 1400 | image_tag: loading: 'eager', fetchpriority: 'high', sizes: '(min-width: 990px) 50vw, 100vw', widths: '540, 720, 900, 1100, 1400', alt: featured.alt | default: product.title }}
+          </div>
+        {%- endif -%}
+
+        {%- if model_media.size > 0 and section.settings.show_3d -%}
+          {%- comment -%}
+            3D models uploaded as product media. Each model is matched to a color by its description (alt text "Blaze"),
+            its file link, or, once loaded, the names of its materials ("Powder coated blaze").
+          {%- endcomment -%}
+          {%- capture color_handles -%}{%- for value in color_option.values -%}{{ value | handleize }}{% unless forloop.last %},{% endunless %}{%- endfor -%}{%- endcapture -%}
+          <div class="model3d" data-model3d data-color="{{ current_color }}" data-colors="{{ color_handles }}" hidden>
+            {%- assign active_set = false -%}
+            {%- for media in model_media -%}
+              {%- liquid
+                assign model_color = ''
+                assign model_color_name = ''
+                assign model_alt = media.alt | downcase
+                assign model_src = media.sources | map: 'url' | join: ' ' | downcase
+                for value in color_option.values
+                  assign value_down = value | downcase
+                  assign value_handle = value | handleize
+                  if model_alt contains value_down or model_src contains value_handle
+                    assign model_color = value_handle
+                    assign model_color_name = value
+                  endif
+                endfor
+                assign model_active = false
+                if model_color == current_color and active_set == false
+                  assign model_active = true
+                  assign active_set = true
+                endif
+                capture model_alt_text
+                  echo product.title
+                  if model_color_name != blank
+                    echo ' in ' | append: model_color_name
+                  endif
+                  echo ', 3D model'
+                endcapture
+              -%}
+              <div class="model3d__item{% if model_active %} is-active{% endif %}" data-model-color="{{ model_color }}" data-model-id="{{ media.id }}">
+                {{ media | model_viewer_tag: image_size: '1200x', alt: model_alt_text, loading: 'lazy', reveal: 'auto', auto-rotate: true, rotation-per-second: '14deg', interaction-prompt: 'none', camera-orbit: '0deg 82deg 112%', shadow-intensity: '1', shadow-softness: '0.8', exposure: '1.05', environment-image: 'neutral' }}
+              </div>
+            {%- endfor -%}
+            <p class="model3d__hint" aria-hidden="true">Drag to turn · Scroll or pinch to zoom</p>
+          </div>
+
+          <div class="model3d__controls">
+            <button type="button" class="model3d__toggle" data-model3d-toggle aria-pressed="false">
+              <span class="model3d__toggle-3d">{% render 'icon', icon: 'cube' %}View in 3D</span>
+              <span class="model3d__toggle-photo">{% render 'icon', icon: 'photo' %}Back to photos</span>
+            </button>
+            <button type="button" class="model3d__ar" data-shopify-xr data-shopify-model3d-id="{{ model_media.first.id }}" data-shopify-title="{{ product.title | escape }}" data-shopify-xr-hidden>
+              {% render 'icon', icon: 'ar' %}View in your space
+            </button>
+          </div>
+          <script type="application/json" data-model-json>{{ model_media | json }}</script>
+        {%- endif -%}
+      </div>
+
+      {%- if color_stack and settings.prefer_product_art == false -%}
+        <ul class="product__thumbs" role="list" aria-label="Colors">
+          {%- for value in color_option.values -%}
+            {%- liquid
+              assign value_handle = value | handleize
+              assign value_variant = product.variants | where: 'option1', value | first
+              if color_index == 1
+                assign value_variant = product.variants | where: 'option2', value | first
+              elsif color_index == 2
+                assign value_variant = product.variants | where: 'option3', value | first
+              endif
+              assign thumb_url = blank
+              if value_variant.featured_media != blank
+                assign thumb_url = value_variant.featured_media.preview_image | image_url: width: 240
+              elsif product.tags contains 'asset-photos'
+                assign thumb_name = settings.asset_photo_prefix | default: 'tamarack-flask-' | append: value_handle | append: '.webp'
+                assign thumb_url = thumb_name | asset_url
+              endif
+            -%}
+            {%- if thumb_url != blank -%}
+              <li>
+                <button type="button" class="thumb{% if value_handle == current_color %} is-active{% endif %}" data-thumb-color="{{ value_handle }}" data-color-value="{{ value | escape }}" aria-label="Show {{ value | escape }}">
+                  <img src="{{ thumb_url }}" alt="" width="120" height="120" loading="lazy">
+                </button>
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- elsif use_art == false and image_media.size > 1 -%}
+        <ul class="product__thumbs" role="list" aria-label="Product images">
+          {%- for media in image_media -%}
+            <li>
+              <button type="button" class="thumb{% if media.id == featured.id %} is-active{% endif %}" data-thumb data-media-id="{{ media.id }}" data-src="{{ media.preview_image | image_url: width: 1400 }}" aria-label="Show image {{ forloop.index }}">
+                {{ media.preview_image | image_url: width: 240 | image_tag: loading: 'lazy', alt: '' }}
+              </button>
+            </li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+
+    <div class="product__info">
+      {%- form 'product', product, id: form_id, class: 'product-form', novalidate: 'novalidate', data-product-form: '' -%}
+        <input type="hidden" name="id" value="{{ current_variant.id }}" data-variant-id>
+        <input type="hidden" name="quantity" value="1" data-quantity-input>
+
+        {%- for block in section.blocks -%}
+          {%- case block.type -%}
+            {%- when 'title' -%}
+              <div class="product__heading" {{ block.shopify_attributes }}>
+                <h1 class="product__title">{{ product.title | escape }}</h1>
+                {%- if product.metafields.custom.capacity != blank -%}
+                  <p class="product__capacity">{{ product.metafields.custom.capacity }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'price' -%}
+              <div class="product__price" {{ block.shopify_attributes }}>
+                {% render 'price', product: product, variant: current_variant %}
+                {%- if bundle_block != blank -%}
+                  <p class="product__price-note">Each, before bundle savings.</p>
+                {%- endif -%}
+              </div>
+
+            {%- when 'variant_picker' -%}
+              {%- unless product.has_only_default_variant -%}
+                <div class="variant-picker" {{ block.shopify_attributes }}>
+                  {%- for option in product.options_with_values -%}
+                    {%- assign option_index = forloop.index0 -%}
+                    <fieldset class="option" data-option-index="{{ option_index }}">
+                      <legend class="option__legend">
+                        {{ option.name | escape }}: <span data-option-value>{{ option.selected_value | escape }}</span>
+                      </legend>
+                      <div class="option__values{% if option_index == color_index %} swatches{% endif %}">
+                        {%- for value in option.values -%}
+                          {%- assign input_id = section.id | append: '-' | append: option.position | append: '-' | append: forloop.index0 -%}
+                          <input
+                            type="radio"
+                            class="visually-hidden option__input"
+                            id="{{ input_id }}"
+                            name="options[{{ option.name | escape }}]"
+                            value="{{ value | escape }}"
+                            form="{{ form_id }}"
+                            data-option-input
+                            {% if option.selected_value == value %}checked{% endif %}
+                          >
+                          {%- if option_index == color_index -%}
+                            {%- capture hex -%}{% render 'color-hex', name: value %}{%- endcapture -%}
+                            <label for="{{ input_id }}" class="swatch swatch--large" style="--swatch: {{ hex }};" data-spark>
+                              <span class="visually-hidden">{{ value | escape }}</span>
+                              <span class="swatch__tip" aria-hidden="true">{{ value | escape }}</span>
+                            </label>
+                          {%- else -%}
+                            <label for="{{ input_id }}" class="pill">{{ value | escape }}</label>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </div>
+                    </fieldset>
+                  {%- endfor -%}
+                </div>
+              {%- endunless -%}
+
+            {%- when 'bundle' -%}
+              <fieldset class="bundle" data-bundle {{ block.shopify_attributes }}>
+                <legend class="option__legend">{{ block.settings.heading | escape }}</legend>
+                <div class="bundle__tiers">
+                  {%- for tier in (1..3) -%}
+                    {%- liquid
+                      assign pct = 0
+                      if tier == 2
+                        assign pct = block.settings.tier_2_discount
+                      elsif tier == 3
+                        assign pct = block.settings.tier_3_discount
+                      endif
+                      assign keep = 100 | minus: pct
+                      assign tier_total = current_variant.price | times: tier | times: keep | divided_by: 100
+                      assign tier_full = current_variant.price | times: tier
+                      assign tier_label = 'unit'
+                      if tier > 1
+                        assign tier_label = 'units'
+                      endif
+                    -%}
+                    <label class="tier{% if tier == 2 %} tier--featured star-border{% endif %}" data-spark>
+                      {%- if tier == 2 -%}<span class="star-border__clip" aria-hidden="true"><span class="star-border__bottom"></span><span class="star-border__top"></span></span>{%- endif -%}
+                      <input type="radio" name="bundle_tier" value="{{ tier }}" class="tier__input" data-tier data-discount="{{ pct }}" {% if tier == 1 %}checked{% endif %}>
+                      <span class="tier__qty">{{ tier }} {{ tier_label }}</span>
+                      <span class="tier__save">{% if pct > 0 %}Save {{ pct }}%{% else %}Standard price{% endif %}</span>
+                      <span class="tier__price">
+                        <span data-tier-total>{{ tier_total | money }}</span>
+                        {%- if pct > 0 -%}<s data-tier-full>{{ tier_full | money }}</s>{%- endif -%}
+                      </span>
+                      {%- if tier == 2 and block.settings.featured_label != blank -%}
+                        <span class="tier__flag">{{ block.settings.featured_label | escape }}</span>
+                      {%- endif -%}
+                    </label>
+                  {%- endfor -%}
+                </div>
+                <p class="bundle__note">{{ block.settings.note | escape }}</p>
+              </fieldset>
+
+            {%- when 'subscription' -%}
+              {%- if product.selling_plan_groups.size > 0 -%}
+                <fieldset class="purchase" data-purchase-options {{ block.shopify_attributes }}>
+                  <legend class="option__legend">{{ block.settings.heading | escape }}</legend>
+                  <label class="purchase__option">
+                    <input type="radio" name="purchase_type" value="once" data-purchase-type {% unless product.requires_selling_plan %}checked{% endunless %}>
+                    <span class="purchase__title">One-time purchase</span>
+                    <span class="purchase__price" data-once-price>{{ current_variant.price | money }}</span>
+                  </label>
+                  {%- for group in product.selling_plan_groups -%}
+                    <div class="purchase__option purchase__option--sub">
+                      <label class="purchase__row">
+                        <input type="radio" name="purchase_type" value="subscribe" data-purchase-type {% if product.requires_selling_plan and forloop.first %}checked{% endif %}>
+                        <span class="purchase__title">{{ group.name | escape }}</span>
+                        <span class="purchase__price" data-sub-price>
+                          {%- assign allocation = current_variant.selling_plan_allocations | where: 'selling_plan_group_id', group.id | first -%}
+                          {%- if allocation -%}{{ allocation.price | money }}{%- endif -%}
+                        </span>
+                      </label>
+                      <label class="purchase__frequency">
+                        <span>Deliver</span>
+                        <select class="field field--select" data-selling-plan-select>
+                          {%- for plan in group.selling_plans -%}
+                            <option value="{{ plan.id }}">{{ plan.name | escape }}</option>
+                          {%- endfor -%}
+                        </select>
+                      </label>
+                    </div>
+                  {%- endfor -%}
+                  <input type="hidden" name="selling_plan" value="" data-selling-plan>
+                  <p class="purchase__note">{{ block.settings.note | escape }}</p>
+                </fieldset>
+              {%- elsif request.design_mode -%}
+                <p class="editor-note" {{ block.shopify_attributes }}>Install the free Shopify Subscriptions app and add a plan to this product to show subscribe and save here.</p>
+              {%- endif -%}
+
+            {%- when 'buy_buttons' -%}
+              <div class="buy" {{ block.shopify_attributes }}>
+                <button type="submit" name="add" class="button button--primary button--block cart-btn" data-add-button {% unless current_variant.available %}disabled{% endunless %}>
+                  <span class="cart-btn__icon" aria-hidden="true">
+                    <svg class="cart-btn__item" viewBox="0 0 12 24" width="7" height="14" focusable="false"><path d="M3 0h6v4H3zM2.5 5.5C2.5 4.7 3.2 4 4 4h4c.8 0 1.5.7 1.5 1.5V22c0 1.1-.9 2-2 2h-3c-1.1 0-2-.9-2-2z"/></svg>
+                    {% render 'icon', icon: 'cart' %}
+                  </span>
+                  <span data-add-label>{% if current_variant.available %}Add to cart{% else %}Sold out{% endif %}</span>
+                </button>
+                {%- if block.settings.show_dynamic_checkout -%}
+                  {{ form | payment_button }}
+                {%- endif -%}
+                <p class="form-message form-message--error" role="alert" hidden data-form-error></p>
+              </div>
+
+            {%- when 'trust' -%}
+              <ul class="trust" role="list" {{ block.shopify_attributes }}>
+                {%- if block.settings.line_1 != blank -%}<li>{% render 'icon', icon: 'truck' %}<span>{{ block.settings.line_1 | escape }}</span></li>{%- endif -%}
+                {%- if block.settings.line_2 != blank -%}<li>{% render 'icon', icon: 'repeat' %}<span>{{ block.settings.line_2 | escape }}</span></li>{%- endif -%}
+                {%- if block.settings.line_3 != blank -%}<li>{% render 'icon', icon: 'shield' %}<span>{{ block.settings.line_3 | escape }}</span></li>{%- endif -%}
+              </ul>
+
+            {%- when 'description' -%}
+              {%- if product.description != blank -%}
+                <div class="rte product__description" {{ block.shopify_attributes }}>{{ product.description }}</div>
+              {%- endif -%}
+
+            {%- when 'retention' -%}
+              {%- if block.settings.require_tag != blank -%}
+                {%- unless product.tags contains block.settings.require_tag -%}{%- continue -%}{%- endunless -%}
+              {%- endif -%}
+              <div class="product__retention" {{ block.shopify_attributes }}>
+                {% render 'retention-track',
+                  cold_hours: block.settings.cold_hours,
+                  cold_temp: block.settings.cold_temp,
+                  hot_hours: block.settings.hot_hours,
+                  hot_temp: block.settings.hot_temp
+                %}
+              </div>
+
+            {%- when 'accordion' -%}
+              <details class="accordion" {{ block.shopify_attributes }}>
+                <summary class="accordion__summary">
+                  <span>{{ block.settings.heading | escape }}</span>
+                  {% render 'icon', icon: 'plus' %}
+                </summary>
+                <div class="accordion__content rte">
+                  {{ block.settings.content }}
+                  {%- if block.settings.page != blank -%}{{ block.settings.page.content }}{%- endif -%}
+                </div>
+              </details>
+
+            {%- when 'text' -%}
+              <div class="rte" {{ block.shopify_attributes }}>{{ block.settings.text }}</div>
+          {%- endcase -%}
+        {%- endfor -%}
+      {%- endform -%}
+    </div>
+  </div>
+
+  <div class="sticky-buy" data-sticky-buy aria-hidden="true">
+    <div class="page-width sticky-buy__inner">
+      <div class="sticky-buy__product">
+        <span class="sticky-buy__title">{{ product.title | escape }}</span>
+        {%- unless product.has_only_default_variant -%}
+          <span class="sticky-buy__variant" data-sticky-variant>{{ current_variant.title | escape }}</span>
+        {%- endunless -%}
+      </div>
+      <span class="sticky-buy__price" data-sticky-price>{{ current_variant.price | money }}</span>
+      <button type="submit" form="{{ form_id }}" class="button button--primary" tabindex="-1" data-sticky-button {% unless current_variant.available %}disabled{% endunless %}>Add to cart</button>
+    </div>
+  </div>
+
+  <script type="application/json" data-product-json>
+    {
+      "variants": {{ product.variants | json }},
+      "colorIndex": {{ color_index }},
+      "colorHex": {
+        {%- if color_index >= 0 -%}
+          {%- for value in color_option.values -%}
+            {%- capture hex -%}{% render 'color-hex', name: value %}{%- endcapture -%}
+            {{ value | json }}: {{ hex | json }}{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        {%- endif -%}
+      },
+      "allocations": {
+        {%- for variant in product.variants -%}
+          "{{ variant.id }}": {
+            {%- for allocation in variant.selling_plan_allocations -%}
+              "{{ allocation.selling_plan.id }}": {{ allocation.price }}{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          }{% unless forloop.last %},{% endunless %}
+        {%- endfor -%}
+      }
+    }
+  </script>
+  <script type="application/ld+json">{{ product | structured_data }}</script>
+</section>
+
+{% schema %}
+{
+  "name": "Product",
+  "tag": "div",
+  "class": "section-main-product",
+  "settings": [
+    { "type": "checkbox", "id": "show_3d", "label": "Show 3D viewer", "info": "Appears when the product has 3D models (.glb) in its media. Name each file or set its description with the color, like tamarack-flask-blaze.glb.", "default": true }
+  ],
+  "blocks": [
+    { "type": "@app" },
+    { "type": "title", "name": "Title", "limit": 1 },
+    { "type": "price", "name": "Price", "limit": 1 },
+    { "type": "variant_picker", "name": "Variant picker", "limit": 1 },
+    {
+      "type": "bundle",
+      "name": "Bundle tiers",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Bundle and save" },
+        { "type": "range", "id": "tier_2_discount", "label": "Discount for 2 units", "min": 0, "max": 40, "step": 1, "unit": "%", "default": 10 },
+        { "type": "range", "id": "tier_3_discount", "label": "Discount for 3 units", "min": 0, "max": 40, "step": 1, "unit": "%", "default": 15 },
+        { "type": "text", "id": "featured_label", "label": "Featured tier label", "default": "Most picked" },
+        { "type": "text", "id": "note", "label": "Note", "default": "Savings apply automatically at checkout. Mix colors in the cart." },
+        { "type": "paragraph", "content": "Create matching automatic discounts in Shopify admin (Discounts > Amount off products, minimum quantity 2 and 3)." }
+      ]
+    },
+    {
+      "type": "subscription",
+      "name": "Subscribe and save",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "How do you want it?" },
+        { "type": "text", "id": "note", "label": "Note", "default": "Skip or cancel any delivery from your account." }
+      ]
+    },
+    {
+      "type": "buy_buttons",
+      "name": "Buy buttons",
+      "limit": 1,
+      "settings": [
+        { "type": "checkbox", "id": "show_dynamic_checkout", "label": "Show dynamic checkout buttons", "default": true }
+      ]
+    },
+    {
+      "type": "trust",
+      "name": "Trust points",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "line_1", "label": "Line 1", "default": "Free shipping over $75" },
+        { "type": "text", "id": "line_2", "label": "Line 2", "default": "30-day trail test, free returns" },
+        { "type": "text", "id": "line_3", "label": "Line 3", "default": "Lifetime warranty on the vacuum seal" }
+      ]
+    },
+    { "type": "description", "name": "Description", "limit": 1 },
+    {
+      "type": "retention",
+      "name": "Temperature track",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "require_tag", "label": "Only show on products tagged", "default": "insulated" },
+        { "type": "number", "id": "cold_hours", "label": "Cold retention (hours)", "default": 24 },
+        { "type": "number", "id": "cold_temp", "label": "Water temperature at the end (°C)", "default": 6 },
+        { "type": "number", "id": "hot_hours", "label": "Hot retention (hours)", "default": 12 },
+        { "type": "number", "id": "hot_temp", "label": "Coffee temperature at the end (°C)", "default": 62 }
+      ]
+    },
+    {
+      "type": "accordion",
+      "name": "Collapsible row",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Specs" },
+        { "type": "richtext", "id": "content", "label": "Content" },
+        { "type": "page", "id": "page", "label": "Content from page" }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Write something about this product.</p>" }
+      ]
+    }
+  ]
+}
+{% endschema %}

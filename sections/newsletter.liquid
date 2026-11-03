@@ -1,0 +1,59 @@
+{%- liquid
+  assign has_photo = false
+  if section.settings.photo != blank or section.settings.photo_url != blank
+    assign has_photo = true
+  endif
+-%}
+<section class="section newsletter{% if has_photo %} newsletter--photo{% endif %}" aria-labelledby="newsletter-{{ section.id }}">
+  {%- if has_photo -%}
+    <div class="newsletter__photo" data-photo-break-media>
+      {% render 'nature-photo', image: section.settings.photo, url: section.settings.photo_url, alt: '', class: 'newsletter__img', position: 'center 40%' %}
+    </div>
+  {%- endif -%}
+  {%- if section.settings.paths -%}
+    <div class="newsletter__paths" aria-hidden="true"><canvas data-background-paths data-count="36" data-angle="-6"></canvas></div>
+  {%- endif -%}
+  <div class="page-width newsletter__inner">
+    <div>
+      <h2 id="newsletter-{{ section.id }}" class="section-title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-lede">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+    </div>
+    {%- form 'customer', class: 'newsletter__form', id: 'NewsletterForm' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      {%- if form.posted_successfully? -%}
+        <p class="form-message form-message--success" role="status">You're on the list. Watch your inbox for the next drop.</p>
+      {%- else -%}
+        <label for="NewsletterEmail-{{ section.id }}" class="visually-hidden">Email</label>
+        <div class="field-row">
+          <input id="NewsletterEmail-{{ section.id }}" type="email" name="contact[email]" class="field" placeholder="you@example.com" autocomplete="email" required>
+          <button type="submit" class="button button--primary send-btn">
+            <span class="send-btn__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="20" height="20" focusable="false"><path fill="currentColor" d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"/></svg>
+            </span>
+            <span class="send-btn__label">Sign up</span>
+          </button>
+        </div>
+        {%- if form.errors -%}
+          <p class="form-message form-message--error" role="alert">Enter a valid email address.</p>
+        {%- endif -%}
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Newsletter",
+  "class": "section-newsletter",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "New colors, first" },
+    { "type": "text", "id": "text", "label": "Text", "default": "One email when a new color or size drops. Nothing else." },
+    { "type": "image_picker", "id": "photo", "label": "Background photo" },
+    { "type": "text", "id": "photo_url", "label": "Background photo link", "info": "Leave empty for a plain background.", "default": "https://images.unsplash.com/photo-1640022578188-063cf5ffe1b5" },
+    { "type": "checkbox", "id": "paths", "label": "Show flowing trail lines", "info": "Adapted from Background Paths by Kokonut UI (21st.dev).", "default": true }
+  ],
+  "presets": [{ "name": "Newsletter" }]
+}
+{% endschema %}

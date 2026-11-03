@@ -1,0 +1,49 @@
+{%- comment -%}
+  Temperature-over-time track for an insulated product.
+  Params: cold_hours, cold_temp, hot_hours, hot_temp
+  Chart space: x 40..960 = 0..24h, y 150..30 = 0..100 °C
+{%- endcomment -%}
+{%- liquid
+  assign cold_hours = cold_hours | default: 24 | times: 1.0
+  assign hot_hours = hot_hours | default: 12 | times: 1.0
+  assign cold_temp = cold_temp | default: 6 | times: 1.0
+  assign hot_temp = hot_temp | default: 62 | times: 1.0
+
+  assign cold_x = cold_hours | divided_by: 24.0 | times: 920 | plus: 40 | round: 1
+  assign cold_y = cold_temp | times: 1.2 | minus: 150 | abs | round: 1
+  assign cold_start_y = 2 | times: 1.2 | minus: 150 | abs | round: 1
+
+  assign hot_x = hot_hours | divided_by: 24.0 | times: 920 | plus: 40 | round: 1
+  assign hot_y = hot_temp | times: 1.2 | minus: 150 | abs | round: 1
+  assign hot_start_y = 92 | times: 1.2 | minus: 150 | abs | round: 1
+
+  assign hot_c1 = hot_x | minus: 40 | times: 0.35 | plus: 40 | round: 1
+  assign hot_c2 = hot_x | minus: 40 | times: 0.7 | plus: 40 | round: 1
+  assign cold_c = cold_x | minus: 40 | times: 0.6 | plus: 40 | round: 1
+-%}
+<figure class="retention" data-retention>
+  <svg class="retention__chart" viewBox="0 0 1000 180" role="img" aria-labelledby="retention-caption" focusable="false">
+    <g class="retention__grid">
+      {%- for h in (0..4) -%}
+        {%- assign gx = h | times: 230 | plus: 40 -%}
+        <line x1="{{ gx }}" x2="{{ gx }}" y1="24" y2="150"/>
+        <text x="{{ gx }}" y="172" text-anchor="middle">{{ h | times: 6 }}h</text>
+      {%- endfor -%}
+      <line class="retention__baseline" x1="40" x2="960" y1="150" y2="150"/>
+    </g>
+    <path pathLength="1" class="retention__line retention__line--hot" d="M40 {{ hot_start_y }} C{{ hot_c1 }} {{ hot_start_y | plus: 22 }} {{ hot_c2 }} {{ hot_y | minus: 6 }} {{ hot_x }} {{ hot_y }}"/>
+    <circle class="retention__dot retention__dot--hot" cx="{{ hot_x }}" cy="{{ hot_y }}" r="6"/>
+    <text class="retention__label" x="{{ hot_x | plus: 14 }}" y="{{ hot_y | plus: 5 }}">
+      <tspan data-count-from="92" data-count-to="{{ hot_temp | round }}">{{ hot_temp | round }}</tspan>°C after {{ hot_hours | round }}h
+    </text>
+
+    <path pathLength="1" class="retention__line retention__line--cold" d="M40 {{ cold_start_y }} Q{{ cold_c }} {{ cold_start_y }} {{ cold_x }} {{ cold_y }}"/>
+    <circle class="retention__dot retention__dot--cold" cx="{{ cold_x }}" cy="{{ cold_y }}" r="6"/>
+    <text class="retention__label" x="{{ cold_x | minus: 14 }}" y="{{ cold_y | minus: 14 }}" text-anchor="end">
+      <tspan data-count-from="2" data-count-to="{{ cold_temp | round }}">{{ cold_temp | round }}</tspan>°C after {{ cold_hours | round }}h
+    </text>
+  </svg>
+  <figcaption id="retention-caption" class="retention__caption">
+    Ice water stays under {{ cold_temp | round }}°C for {{ cold_hours | round }} hours. Coffee poured at 92°C is still {{ hot_temp | round }}°C after {{ hot_hours | round }} hours.
+  </figcaption>
+</figure>

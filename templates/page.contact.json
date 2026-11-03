@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-contact",
+      "blocks": {
+        "replies": { "type": "fact", "settings": { "label": "Replies", "value": "Within one business day" } },
+        "returns": { "type": "fact", "settings": { "label": "Returns", "value": "30-day trail test, free returns" } },
+        "warranty": { "type": "fact", "settings": { "label": "Warranty", "value": "Lifetime, on the vacuum seal" } }
+      },
+      "block_order": ["replies", "returns", "warranty"],
+      "settings": {}
+    },
+    "faq": {
+      "type": "faq",
+      "settings": { "heading": "Quick answers" },
+      "blocks": {
+        "q1": { "type": "question", "settings": { "question": "When will my order ship?", "answer": "<p>This is a portfolio demo store, so nothing ships. In a live store this would list processing and delivery times.</p>" } },
+        "q2": { "type": "question", "settings": { "question": "Can I mix colors in a bundle?", "answer": "<p>Yes. The 2 and 3 unit savings apply to any mix of colors in the cart.</p>" } },
+        "q3": { "type": "question", "settings": { "question": "What does the warranty cover?", "answer": "<p>The vacuum seal, for life. If the flask stops holding temperature, it gets replaced.</p>" } }
+      },
+      "block_order": ["q1", "q2", "q3"]
+    }
+  },
+  "order": ["main", "faq"]
+}

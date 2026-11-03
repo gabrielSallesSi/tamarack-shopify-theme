@@ -1,0 +1,225 @@
+{
+  "sections": {
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "title": {
+          "type": "title",
+          "settings": {}
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "picker": {
+          "type": "variant_picker",
+          "settings": {}
+        },
+        "bundle": {
+          "type": "bundle",
+          "settings": {
+            "heading": "Bundle and save",
+            "tier_2_discount": 10,
+            "tier_3_discount": 15,
+            "featured_label": "Most picked",
+            "note": "Savings apply automatically at checkout. Mix colors in the cart."
+          }
+        },
+        "sub": {
+          "type": "subscription",
+          "settings": {
+            "heading": "How do you want it?",
+            "note": "Skip or cancel any delivery from your account."
+          }
+        },
+        "buy": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_dynamic_checkout": true
+          }
+        },
+        "trust": {
+          "type": "trust",
+          "settings": {
+            "line_1": "Free shipping over $75",
+            "line_2": "30-day trail test, free returns",
+            "line_3": "Lifetime warranty on the vacuum seal"
+          }
+        },
+        "retention": {
+          "type": "retention",
+          "settings": {
+            "cold_hours": 24,
+            "cold_temp": 6,
+            "hot_hours": 12,
+            "hot_temp": 62,
+            "require_tag": "insulated"
+          }
+        },
+        "desc": {
+          "type": "description",
+          "settings": {}
+        },
+        "specs": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Materials",
+            "content": "<p>18/8 stainless steel body, vacuum-insulated double wall, copper-plated inner wall, textured powder coat. BPA-free polypropylene cap with a silicone gasket.</p>"
+          }
+        },
+        "care": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Care",
+            "content": "<p>Hand wash the body with warm soapy water. The cap and gasket are top-rack dishwasher safe. Don't freeze or microwave.</p>"
+          }
+        },
+        "ship": {
+          "type": "accordion",
+          "settings": {
+            "heading": "Shipping and returns",
+            "content": "<p>Ships in 1 to 2 business days. Use it for 30 days, and if it doesn't earn a spot in your pack, send it back for free.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "title",
+        "price",
+        "picker",
+        "bundle",
+        "sub",
+        "buy",
+        "trust",
+        "retention",
+        "desc",
+        "specs",
+        "care",
+        "ship"
+      ],
+      "settings": { "show_3d": true }
+    },
+    "spec": {
+      "type": "spec-sheet",
+      "blocks": {
+        "s1": {
+          "type": "spec",
+          "settings": {
+            "label": "Steel",
+            "value": "18/8 food-grade stainless, double wall"
+          }
+        },
+        "s2": {
+          "type": "spec",
+          "settings": {
+            "label": "Insulation",
+            "value": "Vacuum gap with copper-plated inner wall"
+          }
+        },
+        "s3": {
+          "type": "spec",
+          "settings": {
+            "label": "Finish",
+            "value": "Textured powder coat, no condensation"
+          }
+        },
+        "s4": {
+          "type": "spec",
+          "settings": {
+            "label": "Lid",
+            "value": "Leakproof screw cap, one-finger carry loop"
+          }
+        }
+      },
+      "block_order": [
+        "s1",
+        "s2",
+        "s3",
+        "s4"
+      ],
+      "settings": {}
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Can I put it in the dishwasher?",
+            "answer": "<p>The lid, yes. Hand wash the body so the powder coat lasts.</p>"
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "How does the bundle discount work?",
+            "answer": "<p>Buy two of anything and save 10%. Buy three and save 15%. Colors and sizes can be mixed.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2"
+      ],
+      "settings": {}
+    },
+    "anatomy": {
+      "type": "anatomy",
+      "blocks": {
+        "h1": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Cup lid",
+            "text": "The steel cap unscrews into a 6 oz cup, so you never pour into a cold mug.",
+            "x": 40,
+            "y": 9
+          }
+        },
+        "h2": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Glove-friendly handle",
+            "text": "Wide enough for a gloved hand and it folds flat against the body.",
+            "x": 80,
+            "y": 40
+          }
+        },
+        "h3": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Double steel walls",
+            "text": "A vacuum gap between two layers of 18/8 steel keeps heat where you put it.",
+            "x": 38,
+            "y": 56
+          }
+        },
+        "h4": {
+          "type": "hotspot",
+          "settings": {
+            "title": "Rubber base",
+            "text": "A grippy boot that keeps the flask quiet and upright on rock.",
+            "x": 42,
+            "y": 92
+          }
+        }
+      },
+      "block_order": [
+        "h1",
+        "h2",
+        "h3",
+        "h4"
+      ],
+      "settings": {
+        "product": "expedition-flask",
+        "color": "Glacier",
+        "heading": "Every part earns its weight",
+        "text": "Tap a point on the flask to see what it does."
+      }
+    }
+  },
+  "order": [
+    "main",
+    "anatomy",
+    "spec",
+    "faq"
+  ]
+}

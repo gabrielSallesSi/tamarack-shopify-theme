@@ -1,0 +1,55 @@
+{%- assign menu = linklists[section.settings.menu] -%}
+<header class="site-header" data-header>
+  <div class="page-width site-header__inner">
+    <details class="mobile-nav" data-mobile-nav>
+      <summary class="icon-button mobile-nav__toggle" aria-label="Open menu">
+        {% render 'icon', icon: 'menu' %}
+      </summary>
+      <div class="mobile-nav__panel">
+        <nav aria-label="Mobile">
+          <ul class="mobile-nav__list" role="list">
+            {%- for link in menu.links -%}
+              <li><a href="{{ link.url }}" class="mobile-nav__link"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a></li>
+            {%- endfor -%}
+          </ul>
+        </nav>
+      </div>
+    </details>
+
+    <a href="{{ routes.root_url }}" class="wordmark">
+      {% render 'logo-mark' %}
+      <span class="wordmark__text">{{ shop.name | escape }}</span>
+    </a>
+
+    <nav class="primary-nav" aria-label="Primary">
+      <ul class="primary-nav__list" role="list">
+        {%- for link in menu.links -%}
+          <li>
+            <a href="{{ link.url }}" class="primary-nav__link"{% if link.current %} aria-current="page"{% endif %}>{{ link.title | escape }}</a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+
+    <div class="site-header__actions">
+      <a href="{{ routes.search_url }}" class="icon-button" aria-label="Search">
+        {% render 'icon', icon: 'search' %}
+      </a>
+      <a href="{{ routes.cart_url }}" class="icon-button cart-toggle" data-cart-toggle aria-label="Cart, {{ cart.item_count }} items">
+        {% render 'icon', icon: 'cart' %}
+        <span class="cart-count{% if cart.item_count == 0 %} is-empty{% endif %}" data-cart-count>{{ cart.item_count }}</span>
+      </a>
+    </div>
+  </div>
+  <span class="scroll-progress" data-scroll-progress aria-hidden="true"></span>
+</header>
+
+{% schema %}
+{
+  "name": "Header",
+  "class": "section-header",
+  "settings": [
+    { "type": "link_list", "id": "menu", "label": "Menu", "default": "main-menu" }
+  ]
+}
+{% endschema %}

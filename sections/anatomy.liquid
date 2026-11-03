@@ -1,0 +1,94 @@
+{%- comment -%}
+  Product anatomy: hotspots over the product photo with pop-up notes.
+  Pop-up motion adapted from a Uiverse.io tooltip by vinodjangid07 (MIT).
+{%- endcomment -%}
+{%- liquid
+  assign item = section.settings.product
+  assign show_variant = blank
+  if item != blank
+    assign show_variant = item.selected_or_first_available_variant
+    if section.settings.color != blank
+      for v in item.variants
+        if v.options contains section.settings.color
+          assign show_variant = v
+          break
+        endif
+      endfor
+    endif
+  endif
+-%}
+<section class="section anatomy" aria-labelledby="anatomy-{{ section.id }}">
+  <div class="page-width anatomy__grid">
+    <div class="anatomy__copy">
+      <h2 id="anatomy-{{ section.id }}" class="section-title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <p class="section-lede">{{ section.settings.text | escape }}</p>
+      {%- endif -%}
+      <ul class="anatomy__list" role="list">
+        {%- for block in section.blocks -%}
+          <li class="anatomy__item" data-hotspot-row="{{ block.id }}" {{ block.shopify_attributes }}>
+            <h3 class="anatomy__item-title">{{ block.settings.title | escape }}</h3>
+            <p>{{ block.settings.text | escape }}</p>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+
+    <div class="anatomy__figure" data-anatomy>
+      <div class="anatomy__photo">
+        {%- if item != blank -%}
+          {% render 'product-media', product: item, variant: show_variant, uid: 'anatomy', sizes: '(min-width: 990px) 40vw, 90vw' %}
+        {%- else -%}
+          {% render 'product-art', shape: 'bottle', hex: '#2C3F38', uid: 'anatomy', label: 'Flask' %}
+        {%- endif -%}
+      </div>
+      {%- for block in section.blocks -%}
+        <div class="hotspot hotspot--{% if block.settings.x > 55 %}left{% else %}right{% endif %}" style="--x: {{ block.settings.x }}%; --y: {{ block.settings.y }}%;">
+          <button type="button" class="hotspot__dot" aria-expanded="false" aria-controls="hotspot-{{ block.id }}" data-hotspot="{{ block.id }}">
+            <span class="visually-hidden">{{ block.settings.title | escape }}</span>
+          </button>
+          <div class="hotspot__card" id="hotspot-{{ block.id }}" role="tooltip">
+            <strong>{{ block.settings.title | escape }}</strong>
+            <span>{{ block.settings.text | escape }}</span>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product anatomy",
+  "class": "section-anatomy",
+  "settings": [
+    { "type": "product", "id": "product", "label": "Product" },
+    { "type": "text", "id": "color", "label": "Color to show", "default": "Spruce" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Every part earns its weight" },
+    { "type": "text", "id": "text", "label": "Text", "default": "Tap a point on the flask to see what it does." }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Title", "default": "Cup lid" },
+        { "type": "text", "id": "text", "label": "Text", "default": "The cap doubles as a drinking cup." },
+        { "type": "range", "id": "x", "label": "Horizontal position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 40 },
+        { "type": "range", "id": "y", "label": "Vertical position", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 10 }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product anatomy",
+      "blocks": [
+        { "type": "hotspot", "settings": { "title": "Cup lid", "text": "The steel cap unscrews into a 6 oz cup, so you never pour into a cold mug.", "x": 40, "y": 9 } },
+        { "type": "hotspot", "settings": { "title": "Glove-friendly handle", "text": "Wide enough for a gloved hand and it folds flat against the body.", "x": 80, "y": 40 } },
+        { "type": "hotspot", "settings": { "title": "Double steel walls", "text": "A vacuum gap between two layers of 18/8 steel keeps heat where you put it.", "x": 38, "y": 47 } },
+        { "type": "hotspot", "settings": { "title": "Rubber base", "text": "A grippy boot that keeps the flask quiet and upright on rock.", "x": 42, "y": 92 } }
+      ]
+    }
+  ]
+}
+{% endschema %}

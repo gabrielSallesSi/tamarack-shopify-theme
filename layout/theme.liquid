@@ -1,0 +1,69 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="{{ settings.color_spruce }}">
+    {% render 'favicon' %}
+    <link rel="canonical" href="{{ canonical_url }}">
+
+    <title>
+      {{ page_title }}
+      {%- if current_tags %} &ndash; {{ current_tags | join: ', ' }}{% endif -%}
+      {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+      {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+    </title>
+    {%- if page_description -%}
+      <meta name="description" content="{{ page_description | escape }}">
+    {%- endif -%}
+
+    {% render 'meta-tags' %}
+    {% render 'font-face' %}
+
+    <style>
+      :root {
+        --spruce: {{ settings.color_spruce }};
+        --glacier: {{ settings.color_glacier }};
+        --snow: {{ settings.color_snow }};
+        --granite: {{ settings.color_granite }};
+        --ink: {{ settings.color_ink }};
+        --blaze: {{ settings.color_blaze }};
+      }
+    </style>
+
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+
+    <script>
+      document.documentElement.className = document.documentElement.className.replace('no-js', 'js');
+      window.Tamarack = {
+        routes: {
+          root: {{ routes.root_url | json }},
+          cartAdd: {{ routes.cart_add_url | append: '.js' | json }},
+          cartChange: {{ routes.cart_change_url | append: '.js' | json }},
+          cart: {{ routes.cart_url | json }}
+        },
+        cartDrawer: {{ settings.cart_drawer | json }},
+        assets: { confetti: {{ 'canvas-confetti.js' | asset_url | json }} },
+        moneyFormat: {{ shop.money_format | json }}
+      };
+    </script>
+
+    {{ content_for_header }}
+  </head>
+
+  <body class="template-{{ template.name | handle }}">
+    <a class="skip-link" href="#MainContent">Skip to content</a>
+
+    {% sections 'header-group' %}
+
+    <main id="MainContent" class="main" role="main" tabindex="-1">
+      {{ content_for_layout }}
+    </main>
+
+    {% sections 'footer-group' %}
+
+    {% section 'cart-drawer' %}
+  </body>
+</html>

@@ -1,0 +1,29 @@
+{%- comment -%}
+  Full-bleed nature photo. Uses an uploaded image when one is picked, otherwise a remote photo URL
+  (Unsplash CDN, resized per screen width up to 3840 px, so 4K and retina screens get a full-resolution file).
+  Params: image (image object or blank), url (string), alt, class, loading, position, sizes
+{%- endcomment -%}
+{%- liquid
+  assign loading = loading | default: 'lazy'
+  assign sizes = sizes | default: '100vw'
+  assign position = position | default: 'center center'
+  assign position_style = 'object-position: ' | append: position
+-%}
+{%- if image != blank -%}
+  {{ image | image_url: width: 3840 | image_tag: class: class, loading: loading, sizes: sizes, widths: '750, 1100, 1500, 2000, 2600, 3200, 3840', alt: alt, style: position_style }}
+{%- elsif url != blank -%}
+  {%- assign base = url | split: '?' | first -%}
+  <img
+    class="{{ class }}"
+    src="{{ base }}?w=2400&q=85&auto=format&fit=crop"
+    srcset="{{ base }}?w=750&q=85&auto=format&fit=crop 750w, {{ base }}?w=1200&q=85&auto=format&fit=crop 1200w, {{ base }}?w=1600&q=85&auto=format&fit=crop 1600w, {{ base }}?w=2200&q=85&auto=format&fit=crop 2200w, {{ base }}?w=2800&q=85&auto=format&fit=crop 2800w, {{ base }}?w=3400&q=85&auto=format&fit=crop 3400w, {{ base }}?w=3840&q=85&auto=format&fit=crop 3840w"
+    sizes="{{ sizes }}"
+    alt="{{ alt | escape }}"
+    loading="{{ loading }}"
+    {% if loading == 'eager' %}fetchpriority="high"{% endif %}
+    decoding="async"
+    width="2400"
+    height="1600"
+    style="object-position: {{ position }};"
+  >
+{%- endif -%}

@@ -1,0 +1,48 @@
+{%- comment -%} Params: product, index {%- endcomment -%}
+{%- liquid
+  assign color_index = -1
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'color' or option_name == 'colour'
+      assign color_index = forloop.index0
+      assign color_option = option
+    endif
+  endfor
+  assign uid = 'card-' | append: product.id | append: '-' | append: index
+-%}
+<article class="card" data-card>
+  <a href="{{ product.url }}" class="card__media spotlight" data-card-link data-spotlight tabindex="-1" aria-hidden="true">
+    <span class="spotlight__light"></span>
+    {% render 'product-media', product: product, uid: uid, class: 'card__art', sizes: '(min-width: 990px) 25vw, 50vw' %}
+    <span class="spotlight__edge"></span>
+  </a>
+  <div class="card__body">
+    <h3 class="card__title"><a href="{{ product.url }}" data-card-link>{{ product.title | escape }}</a></h3>
+    {%- if product.metafields.custom.capacity != blank -%}
+      <p class="card__meta">{{ product.metafields.custom.capacity }}</p>
+    {%- elsif product.type != blank -%}
+      <p class="card__meta">{{ product.type | escape }}</p>
+    {%- endif -%}
+    {% render 'price', product: product %}
+
+    {%- if color_index >= 0 and color_option.values.size > 1 -%}
+      <ul class="swatches" role="list" aria-label="Colors for {{ product.title | escape }}">
+        {%- for value in color_option.values -%}
+          {%- liquid
+            assign value_variant = product.variants | where: 'option1', value | first
+            if color_index == 1
+              assign value_variant = product.variants | where: 'option2', value | first
+            elsif color_index == 2
+              assign value_variant = product.variants | where: 'option3', value | first
+            endif
+          -%}
+          <li>
+            {%- assign card_active = false -%}
+            {%- if forloop.first -%}{%- assign card_active = true -%}{%- endif -%}
+            {% render 'swatch', value: value, url: value_variant.url, active: card_active, size: 'small', attr: 'data-card-swatch' %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- endif -%}
+  </div>
+</article>

@@ -1,0 +1,20 @@
+{%- comment -%}
+  Color swatch button with a pop-up name tooltip (tooltip pattern adapted from Uiverse.io by vinodjangid07, MIT).
+  Params: value, url, active (bool), size ('small' | 'large' | blank), attr (data attribute name for JS hooks)
+{%- endcomment -%}
+{%- capture hex -%}{% render 'color-hex', name: value %}{%- endcapture -%}
+<button
+  type="button"
+  class="swatch{% if size == 'small' %} swatch--small{% elsif size == 'large' %} swatch--large{% endif %}{% if active %} is-active{% endif %}"
+  style="--swatch: {{ hex }};"
+  data-swatch
+  {{ attr }}
+  data-hex="{{ hex }}"
+  data-color="{{ value | handleize }}"
+  data-name="{{ value | escape }}"
+  data-url="{{ url }}"
+  aria-label="{{ value | escape }}"
+  aria-pressed="{% if active %}true{% else %}false{% endif %}"
+>
+  <span class="swatch__tip" aria-hidden="true">{{ value | escape }}</span>
+</button>

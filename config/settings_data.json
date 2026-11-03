@@ -1,0 +1,17 @@
+{
+  "current": "Default",
+  "presets": {
+    "Default": {
+      "color_spruce": "#1E3B33",
+      "color_glacier": "#BFD3D6",
+      "color_snow": "#F4F7F7",
+      "color_granite": "#4A4F4D",
+      "color_ink": "#17201D",
+      "color_blaze": "#F2541B",
+      "prefer_product_art": false,
+      "cart_drawer": true,
+      "free_shipping_threshold": 75,
+      "asset_photo_prefix": "tamarack-flask-"
+    }
+  }
+}

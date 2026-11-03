@@ -1,0 +1,27 @@
+{%- comment -%}
+  Maps a color option value to a swatch hex (matched to the product photos).
+  Usage: {%- capture hex -%}{% render 'color-hex', name: value %}{%- endcapture -%}
+{%- endcomment -%}
+{%- liquid
+  assign key = name | handleize
+  case key
+    when 'spruce'
+      echo '#2C3F38'
+    when 'glacier'
+      echo '#96A7AB'
+    when 'blaze'
+      echo '#D55825'
+    when 'granite'
+      echo '#4A4F4D'
+    when 'snow'
+      echo '#D2CFCB'
+    when 'lichen'
+      echo '#8E9B7E'
+    when 'dusk'
+      echo '#5B5F7A'
+    when 'stainless'
+      echo '#B9BEBD'
+    else
+      echo '#2C3F38'
+  endcase
+-%}

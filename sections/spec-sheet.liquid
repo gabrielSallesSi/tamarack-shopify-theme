@@ -1,0 +1,52 @@
+<section class="section spec" aria-labelledby="spec-{{ section.id }}">
+  <div class="page-width spec__grid">
+    <div class="spec__intro">
+      <h2 id="spec-{{ section.id }}" class="section-title">{{ section.settings.heading | escape }}</h2>
+      {%- if section.settings.text != blank -%}
+        <div class="spec__text">{{ section.settings.text }}</div>
+      {%- endif -%}
+    </div>
+    <dl class="spec__list">
+      {%- for block in section.blocks -%}
+        <div class="spec__row" {{ block.shopify_attributes }}>
+          <dt>{{ block.settings.label | escape }}</dt>
+          <dd data-decrypt>{{ block.settings.value | escape }}</dd>
+        </div>
+      {%- endfor -%}
+    </dl>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Spec sheet",
+  "class": "section-spec",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Built like field gear" },
+    { "type": "richtext", "id": "text", "label": "Text", "default": "<p>Every color is the same flask underneath: the same steel, the same seal, the same cup lid. Nothing here needs babying.</p>" }
+  ],
+  "blocks": [
+    {
+      "type": "spec",
+      "name": "Spec row",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Label", "default": "Steel" },
+        { "type": "text", "id": "value", "label": "Value", "default": "18/8 food-grade stainless, double wall" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Spec sheet",
+      "blocks": [
+        { "type": "spec", "settings": { "label": "Steel", "value": "18/8 food-grade stainless, double wall" } },
+        { "type": "spec", "settings": { "label": "Insulation", "value": "Vacuum gap with copper-plated inner wall" } },
+        { "type": "spec", "settings": { "label": "Finish", "value": "Textured powder coat, no condensation" } },
+        { "type": "spec", "settings": { "label": "Lid", "value": "Leakproof screw cap, one-finger carry loop" } },
+        { "type": "spec", "settings": { "label": "Mouth", "value": "Fits standard ice cubes and a cleaning brush" } },
+        { "type": "spec", "settings": { "label": "Care", "value": "Dishwasher-safe lid, hand wash the body" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

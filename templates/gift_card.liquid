@@ -1,0 +1,29 @@
+{% layout none %}
+<!doctype html>
+<html lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gift card for {{ shop.name }}</title>
+    {% render 'font-face' %}
+    <style>
+      :root { --spruce: {{ settings.color_spruce }}; --snow: {{ settings.color_snow }}; --ink: {{ settings.color_ink }}; --blaze: {{ settings.color_blaze }}; --glacier: {{ settings.color_glacier }}; --granite: {{ settings.color_granite }}; }
+    </style>
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    {{ content_for_header }}
+  </head>
+  <body class="template-gift-card">
+    <main class="gate">
+      <div class="gate__inner">
+        <p class="wordmark wordmark--light">{% render 'logo-mark' %}<span class="wordmark__text">{{ shop.name | escape }}</span></p>
+        <h1 class="gate__title">Your gift card</h1>
+        <p class="gate__message">Balance: {{ gift_card.balance | money }}{% if gift_card.expired %} (expired){% endif %}</p>
+        <p class="gift-code">{{ gift_card.code | format_code }}</p>
+        {%- if gift_card.pass_url -%}
+          <a href="{{ gift_card.pass_url }}" class="button">Add to Apple Wallet</a>
+        {%- endif -%}
+        <a href="{{ shop.url }}" class="button button--primary">Start shopping</a>
+      </div>
+    </main>
+  </body>
+</html>

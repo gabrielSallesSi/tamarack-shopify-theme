@@ -1,0 +1,36 @@
+<section class="section">
+  <div class="page-width">
+    <h1 class="page-title">{{ section.settings.heading | escape }}</h1>
+    <ul class="grid grid--collections" role="list">
+      {%- for collection in collections -%}
+        {%- if collection.products_count > 0 -%}
+          {%- assign first = collection.products | first -%}
+          <li>
+            <a href="{{ collection.url }}" class="collection-tile">
+              <div class="collection-tile__media">
+                {%- if collection.image -%}
+                  {{ collection.image | image_url: width: 900 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 33vw, 50vw', alt: collection.title }}
+                {%- else -%}
+                  {%- assign tile_uid = 'col-' | append: collection.id -%}
+                  {% render 'product-media', product: first, uid: tile_uid %}
+                {%- endif -%}
+              </div>
+              <span class="collection-tile__title">{{ collection.title | escape }}</span>
+              <span class="collection-tile__count">{{ collection.products_count }} {{ collection.products_count | pluralize: 'product', 'products' }}</span>
+            </a>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collections list",
+  "class": "section-main-list-collections",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by gear" }
+  ]
+}
+{% endschema %}

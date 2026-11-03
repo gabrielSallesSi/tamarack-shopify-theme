@@ -1,0 +1,121 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Tamarack",
+    "theme_version": "1.0.0",
+    "theme_author": "Gabriel Sá da Silveira",
+    "theme_documentation_url": "https://github.com/gabrielSallesSi",
+    "theme_support_url": "https://github.com/gabrielSallesSi"
+  },
+  {
+    "name": "Favicon",
+    "settings": [
+      {
+        "type": "image_picker",
+        "id": "favicon",
+        "label": "Favicon",
+        "info": "Square image, at least 32 x 32 px. Leave empty to use the Tamarack mountain icon."
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "color",
+        "id": "color_spruce",
+        "label": "Primary dark (Spruce)",
+        "default": "#1E3B33"
+      },
+      {
+        "type": "color",
+        "id": "color_glacier",
+        "label": "Cool tint (Glacier)",
+        "default": "#BFD3D6"
+      },
+      {
+        "type": "color",
+        "id": "color_snow",
+        "label": "Page background (Snow)",
+        "default": "#F4F7F7"
+      },
+      {
+        "type": "color",
+        "id": "color_granite",
+        "label": "Secondary text (Granite)",
+        "default": "#4A4F4D"
+      },
+      {
+        "type": "color",
+        "id": "color_ink",
+        "label": "Text",
+        "default": "#17201D"
+      },
+      {
+        "type": "color",
+        "id": "color_blaze",
+        "label": "Action color (Blaze)",
+        "default": "#F2541B"
+      }
+    ]
+  },
+  {
+    "name": "Product art",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Products without photos are drawn as vector art in the selected color. Add a tag like art-bottle, art-tumbler, art-jug, art-mug, art-lid, art-tin or art-sling to pick the shape."
+      },
+      {
+        "type": "checkbox",
+        "id": "prefer_product_art",
+        "label": "Use vector art even when a product has photos",
+        "default": false
+      },
+      {
+        "type": "text",
+        "id": "asset_photo_prefix",
+        "label": "Theme asset photo prefix",
+        "info": "Products tagged asset-photos use theme assets named prefix + color + .webp when they have no variant images.",
+        "default": "tamarack-flask-"
+      }
+    ]
+  },
+  {
+    "name": "Cart",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "cart_drawer",
+        "label": "Open cart drawer after adding to cart",
+        "default": true
+      },
+      {
+        "type": "number",
+        "id": "free_shipping_threshold",
+        "label": "Free shipping threshold (store currency)",
+        "default": 75
+      },
+      {
+        "type": "product",
+        "id": "cart_upsell_product",
+        "label": "Cart upsell product"
+      }
+    ]
+  },
+  {
+    "name": "Social",
+    "settings": [
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram URL"
+      },
+      {
+        "type": "text",
+        "id": "social_youtube",
+        "label": "YouTube URL"
+      }
+    ]
+  }
+]

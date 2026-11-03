@@ -1,0 +1,34 @@
+{%- comment -%}
+  Words light up one by one as the reader scrolls.
+  Adapted from Text Reveal by Magic UI on 21st.dev (MIT, magicuidesign/magicui).
+{%- endcomment -%}
+{%- assign words = section.settings.text | split: ' ' -%}
+<section class="reveal" data-text-reveal style="--n: {{ words.size }};" aria-labelledby="reveal-{{ section.id }}">
+  <div class="reveal__sticky">
+    <div class="page-width">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="reveal__kicker" id="reveal-{{ section.id }}">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      <p class="reveal__text">
+        <span class="visually-hidden">{{ section.settings.text | escape }}</span>
+        <span aria-hidden="true">
+          {%- for word in words -%}
+            <span class="reveal__word" style="--s: {{ forloop.index0 }};"><span class="reveal__ghost">{{ word | escape }}</span><span class="reveal__lit">{{ word | escape }}</span></span>{% unless forloop.last %} {% endunless %}
+          {%- endfor -%}
+        </span>
+      </p>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Scroll text reveal",
+  "class": "section-reveal",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading", "default": "Why one flask" },
+    { "type": "textarea", "id": "text", "label": "Text", "default": "We make one flask and we make it to outlast the trip. Two steel walls with nothing between them, a stopper that seals in a quarter turn, and a handle you can grab with gloves on." }
+  ],
+  "presets": [{ "name": "Scroll text reveal" }]
+}
+{% endschema %}

@@ -1,0 +1,104 @@
+{%- comment -%}
+  Renders product imagery in one of three modes:
+  1. Photo stack: one photo per color (variant images, or theme assets when the product is tagged asset-photos).
+     Only the active color is visible; JS switches colors without a reload.
+  2. Single photo: the variant image or the first product image (3D models are skipped).
+  3. Vector art in the variant color, when there are no photos.
+  Params: product, variant (optional), uid, sizes, class, loading
+{%- endcomment -%}
+{%- liquid
+  assign variant = variant | default: product.selected_or_first_available_variant
+  assign loading = loading | default: 'lazy'
+  assign sizes = sizes | default: '(min-width: 990px) 33vw, 50vw'
+  assign shape = 'bottle'
+  for tag in product.tags
+    if tag contains 'art-'
+      assign shape = tag | remove: 'art-' | strip
+    endif
+  endfor
+
+  assign color_index = -1
+  assign color_value = ''
+  for option in product.options_with_values
+    assign option_name = option.name | downcase
+    if option_name == 'color' or option_name == 'colour'
+      assign color_index = forloop.index0
+      assign color_option = option
+      assign color_value = variant.options[forloop.index0]
+    endif
+  endfor
+
+  assign has_asset_photos = false
+  if product.tags contains 'asset-photos'
+    assign has_asset_photos = true
+  endif
+
+  assign first_image = product.media | where: 'media_type', 'image' | first
+
+  assign has_variant_photos = false
+  if color_index >= 0
+    for v in product.variants
+      if v.featured_media != blank
+        assign has_variant_photos = true
+        break
+      endif
+    endfor
+  endif
+
+  assign mode = 'art'
+  if settings.prefer_product_art == false
+    if color_index >= 0 and has_variant_photos or color_index >= 0 and has_asset_photos
+      assign mode = 'stack'
+    elsif first_image != blank
+      assign mode = 'single'
+    endif
+  endif
+-%}
+{%- case mode -%}
+  {%- when 'stack' -%}
+    <div class="photo-stack {{ class }}" data-photo-stack>
+      {%- for value in color_option.values -%}
+        {%- liquid
+          assign value_handle = value | handleize
+          assign value_variant = product.variants | where: 'option1', value | first
+          if color_index == 1
+            assign value_variant = product.variants | where: 'option2', value | first
+          elsif color_index == 2
+            assign value_variant = product.variants | where: 'option3', value | first
+          endif
+          assign photo_url = blank
+          if value_variant.featured_media != blank
+            assign photo_url = value_variant.featured_media.preview_image | image_url: width: 1400
+          elsif has_asset_photos
+            assign asset_name = settings.asset_photo_prefix | default: 'tamarack-flask-' | append: value_handle | append: '.webp'
+            assign photo_url = asset_name | asset_url
+          endif
+          assign is_active = false
+          if value == color_value
+            assign is_active = true
+          endif
+        -%}
+        {%- if photo_url != blank -%}
+          <img
+            class="photo-stack__img{% if is_active %} is-active{% endif %}"
+            src="{{ photo_url }}"
+            alt="{{ product.title | escape }} in {{ value | escape }}"
+            data-color="{{ value_handle }}"
+            width="400"
+            height="750"
+            {% if is_active %}loading="{{ loading }}"{% if loading == 'eager' %} fetchpriority="high"{% endif %}{% else %}loading="lazy"{% endif %}
+            decoding="async"
+          >
+        {%- endif -%}
+      {%- endfor -%}
+    </div>
+  {%- when 'single' -%}
+    {%- assign media = variant.featured_media | default: first_image -%}
+    <div class="media {{ class }}">
+      {{ media.preview_image | image_url: width: 1200 | image_tag: loading: loading, sizes: sizes, widths: '360, 540, 720, 900, 1200', alt: media.alt | default: product.title }}
+    </div>
+  {%- else -%}
+    {%- capture hex -%}{% render 'color-hex', name: color_value %}{%- endcapture -%}
+    {%- capture art_label -%}{{ product.title }}{% if color_value != blank %} in {{ color_value }}{% endif %}{%- endcapture -%}
+    {% render 'product-art', shape: shape, hex: hex, uid: uid, label: art_label, class: class %}
+{%- endcase -%}

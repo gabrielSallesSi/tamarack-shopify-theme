@@ -1,0 +1,48 @@
+{%- paginate collection.products by section.settings.per_page -%}
+  <section class="section collection">
+    <div class="page-width">
+      <div class="collection__head">
+        <h1 class="page-title">{{ collection.title | escape }}</h1>
+        {%- if collection.description != blank -%}
+          <div class="rte collection__description">{{ collection.description }}</div>
+        {%- endif -%}
+      </div>
+
+      <div class="collection__toolbar">
+        <p class="collection__count">{{ collection.products_count }} {{ collection.products_count | pluralize: 'product', 'products' }}</p>
+        {%- if section.settings.enable_sort -%}
+          <form class="collection__sort" data-sort-form>
+            <label for="SortBy-{{ section.id }}">Sort by</label>
+            <select id="SortBy-{{ section.id }}" name="sort_by" class="field field--select" data-sort-select>
+              {%- for option in collection.sort_options -%}
+                <option value="{{ option.value | escape }}"{% if option.value == collection.sort_by %} selected{% endif %}>{{ option.name | escape }}</option>
+              {%- endfor -%}
+            </select>
+            <noscript><button type="submit" class="button button--small">Apply</button></noscript>
+          </form>
+        {%- endif -%}
+      </div>
+
+      <ul class="grid grid--products" role="list">
+        {%- for product in collection.products -%}
+          <li>{% render 'product-card', product: product, index: forloop.index %}</li>
+        {%- else -%}
+          <li class="empty-note">No products here yet.</li>
+        {%- endfor -%}
+      </ul>
+
+      {% render 'pagination', paginate: paginate %}
+    </div>
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Collection",
+  "class": "section-main-collection",
+  "settings": [
+    { "type": "range", "id": "per_page", "label": "Products per page", "min": 4, "max": 24, "step": 4, "default": 12 },
+    { "type": "checkbox", "id": "enable_sort", "label": "Enable sorting", "default": true }
+  ]
+}
+{% endschema %}

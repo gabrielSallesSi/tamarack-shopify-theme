@@ -1,0 +1,45 @@
+<section class="section cart-page" data-cart-page>
+  <div class="page-width cart-page__grid">
+    <div>
+      <h1 class="page-title">Cart</h1>
+      {%- if cart.item_count > 0 -%}
+        {% render 'cart-progress' %}
+        <ul class="lines lines--page" role="list">
+          {%- for item in cart.items -%}
+            {% render 'cart-line', item: item, index: forloop.index, uid_prefix: 'page' %}
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <p class="empty-note">Your cart is empty. Start with the bottle most people carry.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="button button--primary">Shop bottles</a>
+      {%- endif -%}
+    </div>
+
+    {%- if cart.item_count > 0 -%}
+      <aside class="cart-summary" aria-label="Order summary">
+        <form action="{{ routes.cart_url }}" method="post" id="CartForm">
+          {%- if section.settings.show_note -%}
+            <label for="CartNote" class="option__legend">Order note</label>
+            <textarea id="CartNote" name="note" class="field field--area" rows="3">{{ cart.note }}</textarea>
+          {%- endif -%}
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <p class="drawer__subtotal drawer__subtotal--muted"><span>{{ discount.title | escape }}</span><span>-{{ discount.total_allocated_amount | money }}</span></p>
+          {%- endfor -%}
+          <p class="drawer__subtotal"><span>Subtotal</span><span>{{ cart.total_price | money }}</span></p>
+          <p class="drawer__fine">Taxes and shipping are calculated at checkout.</p>
+          <button type="submit" name="checkout" class="button button--primary button--block">Check out</button>
+        </form>
+      </aside>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "class": "section-main-cart",
+  "settings": [
+    { "type": "checkbox", "id": "show_note", "label": "Show order note", "default": true }
+  ]
+}
+{% endschema %}
