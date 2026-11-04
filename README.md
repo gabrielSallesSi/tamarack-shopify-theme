@@ -1,6 +1,8 @@
 # Tamarack: a Shopify OS 2.0 theme built from scratch
 
-Tamarack is a portfolio theme for a fictional brand of insulated bottles. Every file was written by hand in Liquid, CSS and vanilla JavaScript, with no starter theme, no framework and no app dependencies. It passes `shopify theme check` with zero offenses.
+[![Shopify Theme Check](https://github.com/gabrielSallesSi/tamarack-shopify-theme/actions/workflows/theme-check.yml/badge.svg?branch=main)](https://github.com/gabrielSallesSi/tamarack-shopify-theme/actions/workflows/theme-check.yml)
+
+Tamarack is a portfolio theme for a fictional brand of insulated bottles. It was built with Liquid, CSS and vanilla JavaScript, without a starter theme or a front-end framework. Shopify Theme Check runs automatically in GitHub Actions on every pull request targeting `main` and every push to `main`.
 
 **Live demo:** [tamarack-gtqamv8f.myshopify.com](https://tamarack-gtqamv8f.myshopify.com) (password: `tamarack`). It is a Shopify development store, so checkout only accepts test payments.
 
@@ -40,7 +42,7 @@ docs/        screenshots used in this README (not part of the theme upload)
 
 ## Install
 
-1. Download this repository as a zip, remove the `docs` folder and the README, and zip the remaining folders.
+1. Download this repository as a ZIP, remove the `docs/` and `.github/` folders plus `README.md`, then zip the Shopify theme folders.
 2. In Shopify admin, go to Online Store > Themes > Add theme > Upload zip file, then publish it.
 3. Import products, tag the product with `asset-photos` and `insulated`, and create a `custom.capacity` product metafield.
 4. Create pages using the `about`, `faq` and `contact` templates and add them to the main menu.
