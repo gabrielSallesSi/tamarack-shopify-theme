@@ -855,8 +855,22 @@
   onScrollFrame();
 
   // Marquee speeds up with scroll speed and reverses on scroll up (pattern from React Bits ScrollVelocity).
+  // Keep the frame loop active only while at least one marquee is visible.
   if (!reduceMotion && marquees.length) {
+    const visibleTracks = new Set();
+    const hasIntersectionObserver = 'IntersectionObserver' in window;
+    let marqueeRaf = 0;
+    const canRun = () => (!hasIntersectionObserver || visibleTracks.size > 0) && !document.hidden;
+
+    const stop = () => {
+      if (marqueeRaf) cancelAnimationFrame(marqueeRaf);
+      marqueeRaf = 0;
+    };
+
     const tickVelocity = (now) => {
+      marqueeRaf = 0;
+      if (!canRun()) return;
+
       const dt = Math.max(1, now - lastT);
       const dy = window.scrollY - lastY;
       lastY = window.scrollY;
@@ -869,9 +883,34 @@
         const anim = track.getAnimations()[0];
         if (anim && !track.matches(':hover')) anim.playbackRate = rate;
       });
-      requestAnimationFrame(tickVelocity);
+      marqueeRaf = requestAnimationFrame(tickVelocity);
     };
-    requestAnimationFrame(tickVelocity);
+
+    const start = () => {
+      if (!canRun() || marqueeRaf) return;
+      lastY = window.scrollY;
+      lastT = performance.now();
+      marqueeRaf = requestAnimationFrame(tickVelocity);
+    };
+
+    if (hasIntersectionObserver) {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) visibleTracks.add(entry.target);
+          else visibleTracks.delete(entry.target);
+        });
+        if (canRun()) start();
+        else stop();
+      });
+      marquees.forEach((track) => observer.observe(track));
+    } else {
+      start();
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stop();
+      else start();
+    });
   }
 
   /* ---------- Anatomy hotspots ---------- */
